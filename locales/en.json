@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Design Context for LLMs",
+    "subtitle": "Export your Figma design as an LLM-ready JSON."
+  },
+  "scope": {
+    "legend": "Scope",
+    "selection": "Selection ({count} node{plural})",
+    "currentPage": "Current page",
+    "allPages": "All pages"
+  },
+  "advanced": {
+    "toggle": "Advanced options",
+    "includeSvg": "Include SVG export (icons ≤ 64×64, max 100)",
+    "includeHidden": "Include hidden nodes",
+    "includeTokens": "Include design tokens"
+  },
+  "actions": {
+    "dump": "Dump",
+    "downloadSlim": "Download Slim ({size})",
+    "downloadFull": "Download Full ({size})",
+    "copySlim": "Copy Slim to Clipboard",
+    "copied": "Copied",
+    "retry": "Retry"
+  },
+  "phase": {
+    "idle": "Ready",
+    "loadingPages": "Loading pages...",
+    "traversing": "Traversing nodes...",
+    "collectingStyles": "Collecting styles...",
+    "collectingVariables": "Collecting variables...",
+    "exportingSvg": "Exporting SVG...",
+    "buildingSlim": "Building Slim...",
+    "sending": "Sending to UI...",
+    "done": "Done"
+  },
+  "progress": {
+    "nodes": "{processed} / {total} nodes",
+    "percent": "{percent}%"
+  },
+  "warnings": {
+    "count": "{count} warning{plural}",
+    "variablesError": "Variables API unavailable (variables skipped).",
+    "svgFailed": "{count} SVG export{plural} failed.",
+    "degraded": "Slim was reduced to fit 500KB: {stages}"
+  },
+  "errors": {
+    "generic": "Something went wrong during dump.",
+    "transport": "Failed to deliver the dump to the UI.",
+    "manifest": "Manifest misconfigured — please reload the plugin.",
+    "emptyScope": "There is nothing to dump — pick a frame or a page."
+  },
+  "locale": {
+    "toggleLabel": "Language",
+    "en": "English",
+    "ko": "한국어"
+  },
+  "a11y": {
+    "progressLabel": "Dump progress",
+    "languageToggleLabel": "Switch language",
+    "advancedToggleLabel": "Show advanced options"
+  }
+}

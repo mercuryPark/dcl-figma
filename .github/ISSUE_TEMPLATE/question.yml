@@ -1,0 +1,35 @@
+name: Question
+description: Ask how to use the plugin or how the schema works.
+title: "[question] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check `README.md` and `docs/SCHEMA.md` first — most usage questions are answered there. If the docs are unclear, this is also a valid bug (against the docs).
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: Describe what you're trying to do and where you're stuck.
+    validations:
+      required: true
+  - type: input
+    id: figma-file
+    attributes:
+      label: Figma file link (optional)
+      placeholder: "https://www.figma.com/file/..."
+  - type: textarea
+    id: context
+    attributes:
+      label: LLM tool / context
+      description: Which LLM coding tool are you using? (Claude Code / Cursor / Copilot / Aider / other)
+    validations:
+      required: true
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I skimmed README.md and docs/SCHEMA.md.
+          required: true

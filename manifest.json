@@ -1,0 +1,16 @@
+{
+  "name": "Design Context for LLMs",
+  "id": "design-context-for-llms",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  },
+  "permissions": ["currentuser"],
+  "menu": [
+    { "name": "Dump design context", "command": "open" }
+  ]
+}

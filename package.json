@@ -1,0 +1,43 @@
+{
+  "name": "design-context-for-llms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Free, open-source Figma plugin that extracts a compact, LLM-ready JSON snapshot (Slim + Full) of your design file.",
+  "license": "MIT",
+  "author": "mercuryPark <mercury@example.com>",
+  "homepage": "https://github.com/mercuryPark/design-context-for-llms",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mercuryPark/design-context-for-llms.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mercuryPark/design-context-for-llms/issues"
+  },
+  "keywords": [
+    "figma",
+    "figma-plugin",
+    "llm",
+    "claude",
+    "cursor",
+    "copilot",
+    "design-tokens",
+    "ai"
+  ],
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit",
+    "verify:locales": "node scripts/verify-locales.mjs",
+    "verify:manifest": "node scripts/verify-manifest.mjs",
+    "verify:size": "node scripts/verify-size.mjs",
+    "verify:all": "npm run typecheck && npm run build && npm run verify:manifest && npm run verify:locales && npm run verify:size"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "1.110.0",
+    "@types/node": "22.7.4",
+    "esbuild": "0.24.0",
+    "typescript": "5.6.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

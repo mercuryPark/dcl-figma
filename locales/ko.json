@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Design Context for LLMs",
+    "subtitle": "Figma 디자인을 LLM용 JSON으로 내보냅니다."
+  },
+  "scope": {
+    "legend": "범위",
+    "selection": "선택 ({count}개 노드{plural})",
+    "currentPage": "현재 페이지",
+    "allPages": "모든 페이지"
+  },
+  "advanced": {
+    "toggle": "고급 옵션",
+    "includeSvg": "SVG export 포함 (아이콘 ≤ 64×64, 최대 100개)",
+    "includeHidden": "숨김 노드 포함",
+    "includeTokens": "디자인 토큰 포함"
+  },
+  "actions": {
+    "dump": "덤프",
+    "downloadSlim": "Slim 다운로드 ({size})",
+    "downloadFull": "Full 다운로드 ({size})",
+    "copySlim": "Slim 클립보드 복사",
+    "copied": "복사됨",
+    "retry": "다시 시도"
+  },
+  "phase": {
+    "idle": "대기 중",
+    "loadingPages": "페이지 로딩 중...",
+    "traversing": "노드 순회 중...",
+    "collectingStyles": "스타일 수집 중...",
+    "collectingVariables": "Variables 수집 중...",
+    "exportingSvg": "SVG 내보내는 중...",
+    "buildingSlim": "Slim 생성 중...",
+    "sending": "UI로 전송 중...",
+    "done": "완료"
+  },
+  "progress": {
+    "nodes": "{processed} / {total} 노드",
+    "percent": "{percent}%"
+  },
+  "warnings": {
+    "count": "경고 {count}개{plural}",
+    "variablesError": "Variables API 사용 불가 (건너뜀).",
+    "svgFailed": "SVG export {count}건{plural} 실패.",
+    "degraded": "Slim이 500KB에 맞게 축소되었습니다: {stages}"
+  },
+  "errors": {
+    "generic": "덤프 중 오류가 발생했습니다.",
+    "transport": "UI로 덤프 전달에 실패했습니다.",
+    "manifest": "Manifest 구성이 잘못되었습니다 — 플러그인을 다시 로드하세요.",
+    "emptyScope": "덤프할 대상이 없습니다 — 프레임이나 페이지를 선택하세요."
+  },
+  "locale": {
+    "toggleLabel": "언어",
+    "en": "English",
+    "ko": "한국어"
+  },
+  "a11y": {
+    "progressLabel": "덤프 진행 상태",
+    "languageToggleLabel": "언어 전환",
+    "advancedToggleLabel": "고급 옵션 열기"
+  }
+}

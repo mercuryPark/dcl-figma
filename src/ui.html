@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none';">
+  <title>Design Context for LLMs</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1e1e1e;
+      --muted: #6a6a6a;
+      --border: #e5e5e5;
+      --accent: #0d99ff;
+      --accent-fg: #ffffff;
+      --warn-bg: #fff6d6;
+      --warn-fg: #7a5b00;
+      --warn-border: #f2d573;
+      --error-bg: #ffecec;
+      --error-fg: #a10606;
+      --error-border: #f2b8b8;
+      --radius: 6px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #2c2c2c;
+        --fg: #eaeaea;
+        --muted: #9a9a9a;
+        --border: #3e3e3e;
+        --accent: #58b6ff;
+        --accent-fg: #0a1420;
+        --warn-bg: #3d3420;
+        --warn-fg: #ffe29a;
+        --warn-border: #7a6525;
+        --error-bg: #3a1414;
+        --error-fg: #ffbdbd;
+        --error-border: #7a2c2c;
+      }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 12px;
+      line-height: 1.45;
+      padding: 16px;
+    }
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    header h1 { font-size: 13px; font-weight: 600; margin: 0; }
+    .locale-toggle button {
+      background: none; border: 1px solid var(--border); color: var(--fg);
+      padding: 4px 8px; margin-left: 4px; border-radius: var(--radius); cursor: pointer;
+      font-size: 11px;
+    }
+    .locale-toggle button[aria-pressed="true"] {
+      background: var(--accent); color: var(--accent-fg); border-color: var(--accent);
+    }
+    .subtitle { color: var(--muted); margin-bottom: 12px; }
+    fieldset { border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; margin: 0 0 12px 0; }
+    fieldset legend { padding: 0 4px; color: var(--muted); font-size: 11px; }
+    fieldset label { display: block; margin: 4px 0; cursor: pointer; }
+    input[type="radio"], input[type="checkbox"] { margin-right: 6px; }
+    details { border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; margin-bottom: 12px; }
+    details summary { cursor: pointer; color: var(--muted); user-select: none; }
+    details[open] summary { color: var(--fg); margin-bottom: 6px; }
+    .primary {
+      width: 100%; padding: 10px; border-radius: var(--radius);
+      background: var(--accent); color: var(--accent-fg); border: 0;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .progress-wrap { margin-top: 12px; }
+    .progress-bar {
+      height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; margin: 4px 0;
+    }
+    .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 150ms linear; }
+    .phase-label { color: var(--muted); font-size: 11px; }
+    .results { display: none; margin-top: 16px; }
+    .results.active { display: block; }
+    .results button {
+      display: block; width: 100%; margin-bottom: 8px; padding: 8px;
+      background: var(--bg); color: var(--fg); border: 1px solid var(--border); border-radius: var(--radius);
+      cursor: pointer; font-size: 12px;
+    }
+    .results button:hover { border-color: var(--accent); }
+    .results button[data-primary="true"] {
+      background: var(--accent); color: var(--accent-fg); border-color: var(--accent);
+    }
+    .badge-warn, .badge-error {
+      display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px;
+      margin: 6px 4px 6px 0;
+    }
+    .badge-warn { background: var(--warn-bg); color: var(--warn-fg); border: 1px solid var(--warn-border); }
+    .badge-error { background: var(--error-bg); color: var(--error-fg); border: 1px solid var(--error-border); }
+    .error-banner {
+      background: var(--error-bg); color: var(--error-fg); border: 1px solid var(--error-border);
+      padding: 10px; border-radius: var(--radius); margin-top: 12px; display: none;
+    }
+    .error-banner.active { display: block; }
+    .warning-list {
+      background: var(--warn-bg); color: var(--warn-fg); border: 1px solid var(--warn-border);
+      padding: 8px 10px; border-radius: var(--radius); margin-top: 8px; display: none;
+      font-size: 11px;
+    }
+    .warning-list.active { display: block; }
+    .warning-list ul { margin: 4px 0 0 16px; padding: 0; }
+    :focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="app-title">Design Context for LLMs</h1>
+    <div class="locale-toggle" role="group" aria-label="Language">
+      <button type="button" data-locale="en" aria-pressed="true">EN</button>
+      <button type="button" data-locale="ko" aria-pressed="false">KO</button>
+    </div>
+  </header>
+
+  <p class="subtitle" id="app-subtitle"></p>
+
+  <fieldset>
+    <legend id="scope-legend">Scope</legend>
+    <label>
+      <input type="radio" name="scope" value="selection" />
+      <span data-i18n-selection>Selection</span>
+    </label>
+    <label>
+      <input type="radio" name="scope" value="currentPage" checked />
+      <span data-i18n="scope.currentPage">Current page</span>
+    </label>
+    <label>
+      <input type="radio" name="scope" value="allPages" />
+      <span data-i18n="scope.allPages">All pages</span>
+    </label>
+  </fieldset>
+
+  <details>
+    <summary data-i18n="advanced.toggle">Advanced options</summary>
+    <label><input type="checkbox" id="opt-svg" /> <span data-i18n="advanced.includeSvg">Include SVG export</span></label>
+    <label><input type="checkbox" id="opt-hidden" /> <span data-i18n="advanced.includeHidden">Include hidden nodes</span></label>
+    <label><input type="checkbox" id="opt-tokens" checked /> <span data-i18n="advanced.includeTokens">Include design tokens</span></label>
+  </details>
+
+  <button class="primary" id="btn-dump" type="button" data-i18n="actions.dump">Dump</button>
+
+  <div class="progress-wrap" aria-live="polite">
+    <div class="progress-bar" role="progressbar" id="progress-bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Dump progress">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="phase-label" id="phase-label"></div>
+  </div>
+
+  <div class="warning-list" id="warning-list" aria-live="polite"></div>
+  <div class="error-banner" id="error-banner" role="alert"></div>
+
+  <div class="results" id="results" aria-live="polite">
+    <button type="button" id="btn-download-slim" data-primary="true"></button>
+    <button type="button" id="btn-download-full"></button>
+    <button type="button" id="btn-copy-slim"></button>
+  </div>
+
+  <!-- UI_SCRIPT -->
+</body>
+</html>
