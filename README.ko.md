@@ -42,7 +42,7 @@ npm run build
 ### 요구 사항
 
 - Figma **Desktop** (웹 전용 환경은 미지원).
-- 최소 Figma Desktop 버전: *TBD — v1.0 publish 직전에 확정.*
+- 현재 유지보수되는 Figma Desktop 빌드 전부 지원. 이 플러그인은 `dynamic-page` document access API 를 사용하는데, [2024-02-21 에 GA 됐고](https://www.figma.com/plugin-docs/updates/2024/02/21/version-1-update-87/) 2024-04 부터 신규 플러그인에 필수로 강제되어 현재 시점 모든 Figma Desktop 에서 동작합니다.
 
 ## 사용법
 

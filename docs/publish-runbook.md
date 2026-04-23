@@ -5,7 +5,7 @@ End-to-end checklist for cutting a v1.x release and submitting it to the Figma C
 ## Pre-flight (one-time per version)
 
 1. Confirm `openspec/changes/<slug>/tasks.md` is fully `[x]`-checked (or has an explicit note for deferred items).
-2. Check the Figma Desktop minimum version in the official [Figma changelog](https://help.figma.com/hc/en-us/articles/4410870118935-Release-notes). Update both `README.md` (`Requirements` section) and `manifest.json` (`minFigmaVersion` if supported) before tagging.
+2. Figma Desktop version: **no explicit pin required**. The plugin uses the `dynamic-page` document access API, which [went GA on 2024-02-21](https://www.figma.com/plugin-docs/updates/2024/02/21/version-1-update-87/) and has been mandatory for new plugins since April 2024. The README already states "current Figma Desktop". If Figma publishes a future breaking change, revisit this.
 3. Visual assets exist under `publish/`:
    - `icon-128.png` — 128 × 128, PNG, ≤ 8 MB.
    - `cover-1920x960.png` — 1920 × 960, PNG, ≤ 8 MB.

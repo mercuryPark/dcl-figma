@@ -42,7 +42,7 @@ Then in Figma Desktop: **Plugins → Development → Import plugin from manifest
 ### Requirements
 
 - Figma **Desktop** (web-only is not supported).
-- Minimum Figma Desktop version: *TBD — pinned before v1.0 publish.*
+- Any current Figma Desktop build. The plugin relies on the `dynamic-page` document access API, which [became generally available on 2024-02-21](https://www.figma.com/plugin-docs/updates/2024/02/21/version-1-update-87/) and has been the default for new plugins since April 2024 — every currently maintained Figma Desktop release supports it.
 
 ## Usage
 
