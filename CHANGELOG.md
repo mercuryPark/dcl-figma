@@ -6,11 +6,7 @@ All notable changes to **Design Context for LLMs** are documented here. This pro
 
 ## [Unreleased]
 
-### Added
-- OpenSpec change `universal-plugin-rebrand` scaffolding: proposal, design, per-capability specs, tasks.
-
-### Changed
-- Project identity pivoted from "잠깐살래 single-purpose dumper" to a general-purpose MIT plugin.
+_Nothing yet._
 
 ## [0.1.0] - 2026-04-23
 
@@ -44,6 +40,8 @@ All notable changes to **Design Context for LLMs** are documented here. This pro
   - `meta.degraded` audit trail for the Slim degradation ladder.
   - Documented in `docs/SCHEMA.md` (narrative) + `src/schema.ts` (types).
 - GitHub Actions CI: typecheck → build → manifest validate → locale parity → 500KB bundle ceiling.
+- Distribution via GitHub Releases with a pre-built `dist/` zip — no Figma Community listing in this release.
+- Validated end-to-end on the 잠깐살래 file: 8,335 nodes, 84 components, 15 variables. Slim 64 KB, Full 2.1 MB, no degradation needed.
 
 [Unreleased]: https://github.com/mercuryPark/design-context-for-llms/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/mercuryPark/design-context-for-llms/releases/tag/v0.1.0

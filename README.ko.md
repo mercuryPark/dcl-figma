@@ -20,15 +20,19 @@ Figma 자체 MCP 서버는 유료 플랜을 요구합니다. 많은 커뮤니티
 
 ## 설치
 
-> **상태:** 릴리즈 전. v1.0 Figma Community publish 는 [`openspec/changes/universal-plugin-rebrand`](/openspec/changes/universal-plugin-rebrand) 에서 추적합니다.
+이 플러그인은 GitHub Releases 로 배포됩니다 — **Figma Community 등록 없음, npm 의존성 없음, 최종 사용자의 빌드 불필요.** 빌드된 zip 을 받아서 원하는 폴더에 풀고, Figma 에 `manifest.json` 을 가리키면 끝입니다.
 
-### Figma Community 에서 설치 (v1.0 출시 후 권장)
+### GitHub Release zip 으로 설치 (권장)
 
-1. Figma Desktop 실행.
-2. 커뮤니티 페이지 방문 (publish 시 링크 추가).
-3. **Open in…** 으로 아무 파일에서 실행.
+1. [Releases](https://github.com/mercuryPark/design-context-for-llms/releases) 에서 최신 `design-context-for-llms-vX.Y.Z.zip` 다운로드.
+2. 원하는 폴더 (예: `~/figma-plugins/design-context-for-llms/`) 에 압축 해제. `manifest.json` 과 `dist/` 폴더가 들어있습니다.
+3. Figma Desktop 열고 **Plugins → Development → Import plugin from manifest…**
+4. 방금 푼 폴더의 `manifest.json` 선택.
+5. 이후부터는 **Plugins → Development → Design Context for LLMs** 로 실행.
 
-### 소스에서 빌드 (개발)
+**업데이트:** 새 버전 나오면 새 zip 받아 같은 폴더에 덮어쓰기. manifest 재임포트 불필요.
+
+### 소스에서 빌드 (기여자용)
 
 ```bash
 git clone https://github.com/mercuryPark/design-context-for-llms.git
@@ -37,7 +41,7 @@ npm ci
 npm run build
 ```
 
-그 다음 Figma Desktop 에서 **Plugins → Development → Import plugin from manifest…** 로 `manifest.json` 선택.
+그 다음 Figma Desktop 에서 **Plugins → Development → Import plugin from manifest…** 로 이 레포의 `manifest.json` 선택.
 
 ### 요구 사항
 

@@ -20,15 +20,19 @@ Figma's own MCP server requires a paid plan. Most community plugins either extra
 
 ## Install
 
-> **Status:** pre-release. v1.0 Figma Community publish is tracked in [`openspec/changes/universal-plugin-rebrand`](/openspec/changes/universal-plugin-rebrand).
+This plugin is distributed via GitHub Releases — **no Figma Community listing, no npm dependency, no build step required for end users.** You download a pre-built zip, unzip it anywhere on your machine, and point Figma at its `manifest.json`.
 
-### From Figma Community (recommended once v1.0 ships)
+### From a GitHub Release zip (recommended)
 
-1. Open Figma Desktop.
-2. Visit the plugin's Community page (link will be added on publish).
-3. Click **Open in…** → pick any file.
+1. Go to [Releases](https://github.com/mercuryPark/design-context-for-llms/releases) and download the latest `design-context-for-llms-vX.Y.Z.zip`.
+2. Unzip it into any folder — for example `~/figma-plugins/design-context-for-llms/`. The folder will contain `manifest.json` and a `dist/` directory.
+3. Open Figma Desktop, then **Plugins → Development → Import plugin from manifest…**
+4. Select the `manifest.json` from the folder you just unzipped.
+5. Run it anytime from **Plugins → Development → Design Context for LLMs**.
 
-### From source (dev)
+**Updating:** when a new release lands, download the new zip and overwrite the same folder. You do not need to re-import the manifest.
+
+### From source (for contributors)
 
 ```bash
 git clone https://github.com/mercuryPark/design-context-for-llms.git
@@ -37,7 +41,7 @@ npm ci
 npm run build
 ```
 
-Then in Figma Desktop: **Plugins → Development → Import plugin from manifest…** → select `manifest.json`.
+Then in Figma Desktop: **Plugins → Development → Import plugin from manifest…** → select this repo's `manifest.json`.
 
 ### Requirements
 
