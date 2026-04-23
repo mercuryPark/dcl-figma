@@ -6,8 +6,8 @@
 
 ## Install
 
-1. Download `design-context-for-llms-v0.1.0.zip` from the **Assets** below.
-2. Unzip into any folder (for example `~/figma-plugins/design-context-for-llms/`).
+1. Download `dcl-figma-v0.1.0.zip` from the **Assets** below.
+2. Unzip into any folder (for example `~/figma-plugins/dcl-figma/`).
 3. In Figma Desktop: **Plugins → Development → Import plugin from manifest…** → select the unzipped `manifest.json`.
 4. Run with **Plugins → Development → Design Context for LLMs**.
 

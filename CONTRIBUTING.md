@@ -11,8 +11,8 @@ Thanks for helping make **Design Context for LLMs** better. This project is a si
 ## Local setup
 
 ```bash
-git clone https://github.com/mercuryPark/design-context-for-llms.git
-cd design-context-for-llms
+git clone https://github.com/mercuryPark/dcl-figma.git
+cd dcl-figma
 npm ci
 ```
 
@@ -63,8 +63,8 @@ Releases are cut manually by the maintainer.
 2. Update `CHANGELOG.md` with a new `## [X.Y.Z] - YYYY-MM-DD` section (keep-a-changelog format).
 3. Run `npm run build` → verify `dist/` contents.
 4. `git tag vX.Y.Z && git push --tags`.
-5. `gh release create vX.Y.Z dist/design-context-for-llms-vX.Y.Z.zip --notes-file CHANGELOG-release-notes.md`
-   - Build the zip with: `(cd dist && zip -r ../design-context-for-llms-vX.Y.Z.zip .)`.
+5. `gh release create vX.Y.Z dist/dcl-figma-vX.Y.Z.zip --notes-file CHANGELOG-release-notes.md`
+   - Build the zip with: `(cd dist && zip -r ../dcl-figma-vX.Y.Z.zip .)`.
 6. (Major only for v1.0+) Re-submit to Figma Community with updated cover/screenshots if UX changes.
 
 ### Semver policy

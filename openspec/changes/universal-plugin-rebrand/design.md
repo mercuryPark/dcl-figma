@@ -155,8 +155,8 @@ Figma Plugin API 제약 (`docs/02-architecture.md:48-58` 기준):
 ## Resolved Decisions (Round 3 인터뷰)
 
 1. **Figma Desktop 최소 버전 정책** (확정): `dynamic-page` API가 공식 지원되는 최소 Figma Desktop 버전을 README에 명시. 정확한 버전 번호는 publish 직전 Figma 공식 changelog 재확인으로 확정(현 시점 추정 2024.10+). Legacy 동기 API 폴백은 v1.0에 포함하지 않음.
-2. **최종 플러그인명** (확정): **`Design Context for LLMs`**. manifest.json의 `name`, Figma Community 리스팅, README 제목, CHANGELOG 헤더 전부 이 이름 사용. 로컬 레포 디렉토리·OpenSpec change slug는 식별자 연속성을 위해 기존 `figma-design-dumper` 유지. GitHub 레포 slug 기본값 `design-context-for-llms`.
-3. **GitHub 공개 위치** (확정): **`github.com/mercuryPark/design-context-for-llms`** (개인 계정). MIT 저작권자 표기 `mercuryPark`. 초기 세팅 즉시 가능, 기여자 유입 시 Organization 이전 경로 열어둠.
+2. **최종 플러그인명** (확정): **`Design Context for LLMs`**. manifest.json의 `name`, Figma Community 리스팅, README 제목, CHANGELOG 헤더 전부 이 이름 사용. 로컬 레포 디렉토리·OpenSpec change slug는 식별자 연속성을 위해 기존 `figma-design-dumper` 유지. GitHub 레포 slug 기본값 `dcl-figma`.
+3. **GitHub 공개 위치** (확정): **`github.com/mercuryPark/dcl-figma`** (개인 계정). MIT 저작권자 표기 `mercuryPark`. 초기 세팅 즉시 가능, 기여자 유입 시 Organization 이전 경로 열어둠.
 4. **Figma Community publish 정책** (확정): **무료 + 공개 + Tipping 비활성**. 순수 OSS 포지셔닝과 "MCP 비용 부담 없이" 미션 일치.
 
 ## Remaining Open Questions

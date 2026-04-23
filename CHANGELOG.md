@@ -43,5 +43,5 @@ _Nothing yet._
 - Distribution via GitHub Releases with a pre-built `dist/` zip — no Figma Community listing in this release.
 - Validated end-to-end on the 잠깐살래 file: 8,335 nodes, 84 components, 15 variables. Slim 64 KB, Full 2.1 MB, no degradation needed.
 
-[Unreleased]: https://github.com/mercuryPark/design-context-for-llms/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/mercuryPark/design-context-for-llms/releases/tag/v0.1.0
+[Unreleased]: https://github.com/mercuryPark/dcl-figma/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/mercuryPark/dcl-figma/releases/tag/v0.1.0

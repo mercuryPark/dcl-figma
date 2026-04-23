@@ -3,10 +3,10 @@
 // in narrative form and tracks version diffs.
 
 export const SCHEMA_VERSION = "1.0";
-export const SCHEMA_URL = "https://design-context-for-llms.dev/schemas/1.0.json";
+export const SCHEMA_URL = "https://dcl-figma.dev/schemas/1.0.json";
 export const HOW_TO_USE =
   "Figma design dump for LLM context. Load this JSON and reference screens[], tokens, and components when generating UI code.";
-export const TOOL_ID = "design-context-for-llms";
+export const TOOL_ID = "dcl-figma";
 
 export interface Meta {
   fileKey: string | null;

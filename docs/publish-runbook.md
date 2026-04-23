@@ -44,10 +44,10 @@ git tag vX.Y.Z
 git push origin main vX.Y.Z
 
 # 4. Build the release zip
-(cd dist && zip -r ../design-context-for-llms-vX.Y.Z.zip .)
+(cd dist && zip -r ../dcl-figma-vX.Y.Z.zip .)
 
 # 5. Publish the GitHub Release with the zip attached
-gh release create vX.Y.Z design-context-for-llms-vX.Y.Z.zip \
+gh release create vX.Y.Z dcl-figma-vX.Y.Z.zip \
   --title "vX.Y.Z" \
   --notes-file CHANGELOG-release-notes.md
 ```

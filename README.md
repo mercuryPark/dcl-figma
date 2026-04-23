@@ -24,8 +24,8 @@ This plugin is distributed via GitHub Releases — **no Figma Community listing,
 
 ### From a GitHub Release zip (recommended)
 
-1. Go to [Releases](https://github.com/mercuryPark/design-context-for-llms/releases) and download the latest `design-context-for-llms-vX.Y.Z.zip`.
-2. Unzip it into any folder — for example `~/figma-plugins/design-context-for-llms/`. The folder will contain `manifest.json` and a `dist/` directory.
+1. Go to [Releases](https://github.com/mercuryPark/dcl-figma/releases) and download the latest `dcl-figma-vX.Y.Z.zip`.
+2. Unzip it into any folder — for example `~/figma-plugins/dcl-figma/`. The folder will contain `manifest.json` and a `dist/` directory.
 3. Open Figma Desktop, then **Plugins → Development → Import plugin from manifest…**
 4. Select the `manifest.json` from the folder you just unzipped.
 5. Run it anytime from **Plugins → Development → Design Context for LLMs**.
@@ -35,8 +35,8 @@ This plugin is distributed via GitHub Releases — **no Figma Community listing,
 ### From source (for contributors)
 
 ```bash
-git clone https://github.com/mercuryPark/design-context-for-llms.git
-cd design-context-for-llms
+git clone https://github.com/mercuryPark/dcl-figma.git
+cd dcl-figma
 npm ci
 npm run build
 ```
@@ -73,10 +73,10 @@ figma.{fileSlug}.{pageSlug}.full.json
 
 ```json
 {
-  "$schema": "https://design-context-for-llms.dev/schemas/1.0.json",
+  "$schema": "https://dcl-figma.dev/schemas/1.0.json",
   "schemaVersion": "1.0",
   "_howToUse": "Figma design dump for LLM context. Load this JSON and reference screens[], tokens, and components when generating UI code.",
-  "meta": { "fileKey": "...", "pageId": "...", "generatedAt": "...", "tool": "design-context-for-llms@1.0.0", "degraded": [] }
+  "meta": { "fileKey": "...", "pageId": "...", "generatedAt": "...", "tool": "dcl-figma@1.0.0", "degraded": [] }
 }
 ```
 

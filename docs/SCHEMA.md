@@ -28,7 +28,7 @@ Every dump begins with four "self-documenting" fields so a single file tells its
 | `fileName` | `string` | Verbatim Figma file name. |
 | `pageId` | `string` | Page id for single-page dumps. For `all`-page dumps this is the currently focused page id. |
 | `pageName` | `string` | Verbatim page name. For `all` dumps this is `"(all pages)"`. |
-| `tool` | `string` | `design-context-for-llms@X.Y.Z`. |
+| `tool` | `string` | `dcl-figma@X.Y.Z`. |
 | `generatedAt` | `string` | UTC ISO 8601 timestamp. |
 | `degraded` | `string[]` | Slim only; always `[]` for Full. See **Slim degradation ladder**. |
 | `stats` | `object` | `{ totalNodes, svgExported, svgFailed, variablesError }`. |

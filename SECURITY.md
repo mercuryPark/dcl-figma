@@ -27,8 +27,8 @@ The project is pre-1.0 during the `universal-plugin-rebrand` rollout. Once v1.0 
 
 **Do not** open a public GitHub Issue for security reports. Instead:
 
-1. Open a **Private Vulnerability Report** via the GitHub Security tab on the `mercuryPark/design-context-for-llms` repository, **or**
-2. Email the maintainer with the subject `[security] design-context-for-llms: <one-line summary>`.
+1. Open a **Private Vulnerability Report** via the GitHub Security tab on the `mercuryPark/dcl-figma` repository, **or**
+2. Email the maintainer with the subject `[security] dcl-figma: <one-line summary>`.
 
 Include:
 

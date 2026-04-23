@@ -141,6 +141,6 @@
 
 - [x] 17.1 Figma Desktop 최소 버전 명시 — `dynamic-page` API 가 2024-02-21 GA 후 모든 신규 플러그인에 강제됐으므로 "current Figma Desktop" 으로 충분. README (영/한) + publish-runbook 반영, `manifest.json` 에 `minFigmaVersion` 핀은 불필요
 - [x] 17.2 최종 플러그인명 확정: **Design Context for LLMs**
-- [x] 17.3 GitHub 공개 위치 확정: `github.com/mercuryPark/design-context-for-llms` (개인 계정, MIT 저작권자 `mercuryPark`)
+- [x] 17.3 GitHub 공개 위치 확정: `github.com/mercuryPark/dcl-figma` (개인 계정, MIT 저작권자 `mercuryPark`)
 - [x] 17.4 Figma Community publish 정책 확정: 무료 + 공개 + Tipping 비활성
 - [x] 17.5 비주얼 에셋 디자인 톤 확정 — **Tone A: Minimal Tech** (검정 `#0B0B0F` + 터미널 그린 `#59E8B5` + 앰버 `#FF6A3D` + JetBrains Mono). `publish/ASSET-SPECS.md` 에 5개 에셋 상세 스펙 작성

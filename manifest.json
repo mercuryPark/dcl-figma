@@ -1,6 +1,6 @@
 {
   "name": "Design Context for LLMs",
-  "id": "design-context-for-llms",
+  "id": "dcl-figma",
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",

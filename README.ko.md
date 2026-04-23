@@ -24,8 +24,8 @@ Figma 자체 MCP 서버는 유료 플랜을 요구합니다. 많은 커뮤니티
 
 ### GitHub Release zip 으로 설치 (권장)
 
-1. [Releases](https://github.com/mercuryPark/design-context-for-llms/releases) 에서 최신 `design-context-for-llms-vX.Y.Z.zip` 다운로드.
-2. 원하는 폴더 (예: `~/figma-plugins/design-context-for-llms/`) 에 압축 해제. `manifest.json` 과 `dist/` 폴더가 들어있습니다.
+1. [Releases](https://github.com/mercuryPark/dcl-figma/releases) 에서 최신 `dcl-figma-vX.Y.Z.zip` 다운로드.
+2. 원하는 폴더 (예: `~/figma-plugins/dcl-figma/`) 에 압축 해제. `manifest.json` 과 `dist/` 폴더가 들어있습니다.
 3. Figma Desktop 열고 **Plugins → Development → Import plugin from manifest…**
 4. 방금 푼 폴더의 `manifest.json` 선택.
 5. 이후부터는 **Plugins → Development → Design Context for LLMs** 로 실행.
@@ -35,8 +35,8 @@ Figma 자체 MCP 서버는 유료 플랜을 요구합니다. 많은 커뮤니티
 ### 소스에서 빌드 (기여자용)
 
 ```bash
-git clone https://github.com/mercuryPark/design-context-for-llms.git
-cd design-context-for-llms
+git clone https://github.com/mercuryPark/dcl-figma.git
+cd dcl-figma
 npm ci
 npm run build
 ```
@@ -73,10 +73,10 @@ figma.{fileSlug}.{pageSlug}.full.json
 
 ```json
 {
-  "$schema": "https://design-context-for-llms.dev/schemas/1.0.json",
+  "$schema": "https://dcl-figma.dev/schemas/1.0.json",
   "schemaVersion": "1.0",
   "_howToUse": "Figma design dump for LLM context. Load this JSON and reference screens[], tokens, and components when generating UI code.",
-  "meta": { "fileKey": "...", "pageId": "...", "generatedAt": "...", "tool": "design-context-for-llms@1.0.0", "degraded": [] }
+  "meta": { "fileKey": "...", "pageId": "...", "generatedAt": "...", "tool": "dcl-figma@1.0.0", "degraded": [] }
 }
 ```
 
