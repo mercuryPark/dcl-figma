@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Design Context for LLMs — Figma → JSON for Claude, Cursor, Copilot</title>
+  <meta name="description" content="Free, zero-telemetry Figma plugin that exports your design file as an LLM-ready JSON snapshot. Works with Claude Code, Cursor, GitHub Copilot, Aider. MIT licensed." />
+  <meta property="og:title" content="Design Context for LLMs" />
+  <meta property="og:description" content="Figma → JSON. Ready for your LLM. Free, zero-telemetry, MIT." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/og-image.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="canonical" href="https://dcl-figma.vercel.app/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body data-lang="en">
+  <header class="site-header">
+    <a class="brand" href="/">
+      <svg width="28" height="28" viewBox="0 0 128 128" aria-hidden="true">
+        <rect width="128" height="128" rx="24" fill="#0B0B0F"/>
+        <path d="M46 32 C 38 32, 34 36, 34 44 L 34 58 C 34 62, 30 64, 26 64 C 30 64, 34 66, 34 70 L 34 84 C 34 92, 38 96, 46 96" fill="none" stroke="#59E8B5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M82 32 C 90 32, 94 36, 94 44 L 94 58 C 94 62, 98 64, 102 64 C 98 64, 94 66, 94 70 L 94 84 C 94 92, 90 96, 82 96" fill="none" stroke="#59E8B5" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="44" y="61" width="40" height="6" rx="1" fill="#FF6A3D"/>
+      </svg>
+      <span>dcl-figma</span>
+    </a>
+    <nav class="nav">
+      <a href="#install" data-i18n="nav.install">Install</a>
+      <a href="#usage" data-i18n="nav.usage">Usage</a>
+      <a href="#snippets" data-i18n="nav.snippets">Snippets</a>
+      <a href="#privacy" data-i18n="nav.privacy">Privacy</a>
+      <a href="https://github.com/mercuryPark/dcl-figma" class="gh" target="_blank" rel="noopener">GitHub ↗</a>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang-switch="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang-switch="ko" aria-pressed="false">KO</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-text">
+        <div class="eyebrow"><span class="pulse"></span><span data-i18n="hero.eyebrow">v0.1.0 · pre-release · MIT licensed</span></div>
+        <h1 data-i18n="hero.title">Design Context for LLMs</h1>
+        <p class="tagline" data-i18n="hero.tagline">Figma → JSON. Ready for your LLM.</p>
+        <p class="sub" data-i18n="hero.sub">A free and open-source Figma plugin that exports your design file as a compact, self-documenting JSON snapshot — ready to paste into Claude Code, Cursor, GitHub Copilot, Aider, or any LLM session.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/mercuryPark/dcl-figma/releases/latest" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 1v9.5l3-3 1.4 1.4L8 13.3 3.6 8.9 5 7.5l3 3V1z"/><path fill="currentColor" d="M2 13h12v2H2z"/></svg>
+            <span data-i18n="hero.download">Download .zip</span>
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/mercuryPark/dcl-figma" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.4c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5 0-.5 0-.5.8.1 1.3.9 1.3.9.7 1.3 2 .9 2.5.7.1-.6.3-.9.5-1.1-1.8-.2-3.7-.9-3.7-4 0-.9.3-1.6.8-2.2-.1-.2-.4-1 .1-2.2 0 0 .7-.2 2.2.8.6-.2 1.3-.3 2-.3s1.4.1 2 .3c1.5-1 2.2-.8 2.2-.8.4 1.1.2 2 .1 2.2.5.6.8 1.3.8 2.2 0 3.1-1.9 3.8-3.7 4 .3.2.5.7.5 1.4v2.1c0 .2.1.5.5.4A8 8 0 0 0 8 0"/></svg>
+            <span data-i18n="hero.viewGithub">View on GitHub</span>
+          </a>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-num">0</div>
+            <div class="stat-label" data-i18n="hero.stat1">runtime deps</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">&lt;500 KB</div>
+            <div class="stat-label" data-i18n="hero.stat2">Slim output</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">8,335</div>
+            <div class="stat-label" data-i18n="hero.stat3">nodes validated</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-code">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+            <span class="terminal-title">figma.my-design.home.slim.json</span>
+          </div>
+          <pre><code><span class="tk-punct">{</span>
+  <span class="tk-key">"$schema"</span><span class="tk-punct">:</span> <span class="tk-str">"https://dcl-figma.dev/schemas/1.0.json"</span><span class="tk-punct">,</span>
+  <span class="tk-key">"schemaVersion"</span><span class="tk-punct">:</span> <span class="tk-str">"1.0"</span><span class="tk-punct">,</span>
+  <span class="tk-key">"_howToUse"</span><span class="tk-punct">:</span> <span class="tk-str">"Figma design dump for LLM context..."</span><span class="tk-punct">,</span>
+  <span class="tk-key">"meta"</span><span class="tk-punct">: {</span>
+    <span class="tk-key">"fileName"</span><span class="tk-punct">:</span> <span class="tk-str">"my-design"</span><span class="tk-punct">,</span>
+    <span class="tk-key">"tool"</span><span class="tk-punct">:</span> <span class="tk-str">"dcl-figma@0.1.0"</span><span class="tk-punct">,</span>
+    <span class="tk-key">"stats"</span><span class="tk-punct">: {</span> <span class="tk-key">"totalNodes"</span><span class="tk-punct">:</span> <span class="tk-num">8335</span> <span class="tk-punct">}</span>
+  <span class="tk-punct">},</span>
+  <span class="tk-key">"screens"</span><span class="tk-punct">:</span> <span class="tk-punct">[ </span><span class="tk-com">/* 92 screens */</span><span class="tk-punct"> ],</span>
+  <span class="tk-key">"tokens"</span><span class="tk-punct">: {</span>
+    <span class="tk-key">"colors"</span><span class="tk-punct">:</span> <span class="tk-punct">[...],</span>
+    <span class="tk-key">"variables"</span><span class="tk-punct">:</span> <span class="tk-punct">[...]</span>
+  <span class="tk-punct">}</span>
+<span class="tk-punct">}</span></code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why -->
+    <section class="why">
+      <h2 data-i18n="why.title">Why this exists</h2>
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-icon">$</div>
+          <h3 data-i18n="why.free.title">Free alternative to Figma MCP</h3>
+          <p data-i18n="why.free.body">Figma's own MCP server requires a paid plan. This plugin gives every LLM coding tool the same context — at no cost.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">⌘</div>
+          <h3 data-i18n="why.zero.title">Zero network, zero telemetry</h3>
+          <p data-i18n="why.zero.body"><code>networkAccess.allowedDomains: ["none"]</code>. CI enforces it. No analytics, no beacons, no phone-home.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">◆</div>
+          <h3 data-i18n="why.shrink.title">Smart auto-shrink</h3>
+          <p data-i18n="why.shrink.body">If Slim exceeds 500 KB, the plugin reduces <code>textSummary</code>, then <code>sectionTree</code>, then drops tokens — each step logged in <code>meta.degraded</code>.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon">∞</div>
+          <h3 data-i18n="why.neutral.title">Tool-neutral</h3>
+          <p data-i18n="why.neutral.body">Works with Claude Code, Cursor, GitHub Copilot, Aider, ChatGPT — the JSON is just JSON. No vendor lock-in.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Install -->
+    <section id="install" class="install">
+      <div class="section-head">
+        <h2 data-i18n="install.title">Install</h2>
+        <p data-i18n="install.sub">No build. No npm. No Figma paid tier.</p>
+      </div>
+      <ol class="steps">
+        <li>
+          <span class="step-num">01</span>
+          <div>
+            <h3 data-i18n="install.s1.title">Download the release zip</h3>
+            <p data-i18n="install.s1.body">Grab the latest <code>dcl-figma-vX.Y.Z.zip</code> from GitHub Releases.</p>
+            <a class="btn btn-small" href="https://github.com/mercuryPark/dcl-figma/releases/latest" target="_blank" rel="noopener"><span data-i18n="install.s1.cta">Open Releases →</span></a>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">02</span>
+          <div>
+            <h3 data-i18n="install.s2.title">Unzip anywhere</h3>
+            <p data-i18n="install.s2.body">For example <code>~/figma-plugins/dcl-figma/</code>. The folder contains <code>manifest.json</code> and a <code>dist/</code> directory.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">03</span>
+          <div>
+            <h3 data-i18n="install.s3.title">Import in Figma Desktop</h3>
+            <p data-i18n="install.s3.body">Menu → <strong>Plugins → Development → Import plugin from manifest…</strong> → select the <code>manifest.json</code> from the folder you unzipped.</p>
+          </div>
+        </li>
+        <li>
+          <span class="step-num">04</span>
+          <div>
+            <h3 data-i18n="install.s4.title">Run it</h3>
+            <p data-i18n="install.s4.body"><strong>Plugins → Development → Design Context for LLMs</strong>. Done.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Usage -->
+    <section id="usage" class="usage">
+      <div class="section-head">
+        <h2 data-i18n="usage.title">How it flows</h2>
+        <p data-i18n="usage.sub">Figma file → plugin → LLM. About 30 seconds.</p>
+      </div>
+      <div class="usage-grid">
+        <div class="usage-step">
+          <div class="usage-num">1</div>
+          <h3 data-i18n="usage.s1.title">Click Dump</h3>
+          <p data-i18n="usage.s1.body">Open the plugin, pick scope, click one button.</p>
+          <div class="mock-plugin" aria-hidden="true">
+            <div class="mock-header">
+              <span class="mock-title">Design Context for LLMs</span>
+              <span class="mock-lang-pill">EN</span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-fieldset">
+                <div class="mock-legend">Scope</div>
+                <label><span class="mock-radio filled"></span> Selection</label>
+                <label><span class="mock-radio"></span> Current page</label>
+                <label><span class="mock-radio"></span> All pages</label>
+              </div>
+              <details class="mock-details">
+                <summary>Advanced options</summary>
+              </details>
+              <button class="mock-primary" tabindex="-1">Dump</button>
+            </div>
+          </div>
+        </div>
+        <div class="usage-arrow" aria-hidden="true">→</div>
+        <div class="usage-step">
+          <div class="usage-num">2</div>
+          <h3 data-i18n="usage.s2.title">Get JSON</h3>
+          <p data-i18n="usage.s2.body">Download Slim, Full, or copy straight to clipboard.</p>
+          <div class="mock-plugin result" aria-hidden="true">
+            <div class="mock-header">
+              <span class="mock-title">Design Context for LLMs</span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-progress"><div class="mock-bar"></div></div>
+              <div class="mock-phase">Done</div>
+              <button class="mock-result primary" tabindex="-1">Download Slim (64.0 KB)</button>
+              <button class="mock-result" tabindex="-1">Download Full (2.1 MB)</button>
+              <button class="mock-result" tabindex="-1">Copy Slim to Clipboard</button>
+            </div>
+          </div>
+        </div>
+        <div class="usage-arrow" aria-hidden="true">→</div>
+        <div class="usage-step">
+          <div class="usage-num">3</div>
+          <h3 data-i18n="usage.s3.title">Paste into your LLM</h3>
+          <p data-i18n="usage.s3.body">Drag the file into Claude Code, Cursor, ChatGPT — or paste the clipboard content.</p>
+          <div class="mock-chat" aria-hidden="true">
+            <div class="mock-message user">
+              <div class="mock-role">you</div>
+              <div class="mock-text">Build the login screen using <span class="hl">screens[0]</span> and <span class="hl">tokens.variables</span>.</div>
+              <div class="mock-attach">📎 figma.my-design.all.slim.json · 64 KB</div>
+            </div>
+            <div class="mock-message assistant">
+              <div class="mock-role">Claude</div>
+              <div class="mock-text"><span class="hl">src/screens/LoginScreen.tsx</span> generated ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Snippets -->
+    <section id="snippets" class="snippets">
+      <div class="section-head">
+        <h2 data-i18n="snip.title">Integration snippets</h2>
+        <p data-i18n="snip.sub">Paste these into your LLM session after attaching the JSON.</p>
+      </div>
+      <div class="tabs" role="tablist">
+        <button role="tab" data-tab="claude" aria-selected="true">Claude Code</button>
+        <button role="tab" data-tab="cursor" aria-selected="false">Cursor</button>
+        <button role="tab" data-tab="copilot" aria-selected="false">Copilot</button>
+        <button role="tab" data-tab="aider" aria-selected="false">Aider</button>
+        <button role="tab" data-tab="generic" aria-selected="false">Generic</button>
+      </div>
+      <div class="tab-panels">
+        <div class="panel active" data-panel="claude">
+          <button class="copy-btn" data-copy-target="snip-claude" aria-label="Copy"><span data-i18n="snip.copy">Copy</span></button>
+          <pre id="snip-claude"><code>I've attached a Figma dump (figma.*.slim.json).
+
+When generating UI code, reference:
+- screens[] for layout + copy,
+- tokens.colors / tokens.variables for design tokens,
+- components[] for reusable patterns.
+
+Do not invent component names that are not in the JSON.</code></pre>
+        </div>
+        <div class="panel" data-panel="cursor">
+          <button class="copy-btn" data-copy-target="snip-cursor" aria-label="Copy"><span data-i18n="snip.copy">Copy</span></button>
+          <pre id="snip-cursor"><code>@figma.my-app.home.slim.json
+
+Use this Figma dump as the source of truth for screen
+structure, copy, and tokens. Match tokens exactly (hex
+and name). Ignore nodes whose `visible` is explicitly
+false.</code></pre>
+        </div>
+        <div class="panel" data-panel="copilot">
+          <button class="copy-btn" data-copy-target="snip-copilot" aria-label="Copy"><span data-i18n="snip.copy">Copy</span></button>
+          <pre id="snip-copilot"><code>/explain Use the file figma.my-app.home.slim.json as the
+design reference. When I ask for a component, map it to
+the matching entry in components[] and respect
+tokens.typography line heights.</code></pre>
+        </div>
+        <div class="panel" data-panel="aider">
+          <button class="copy-btn" data-copy-target="snip-aider" aria-label="Copy"><span data-i18n="snip.copy">Copy</span></button>
+          <pre id="snip-aider"><code>aider figma.my-app.home.slim.json src/
+# then in the chat:
+# Use the figma.*.slim.json as the canonical UI spec.
+# Fields: screens, tokens, components.</code></pre>
+        </div>
+        <div class="panel" data-panel="generic">
+          <button class="copy-btn" data-copy-target="snip-generic" aria-label="Copy"><span data-i18n="snip.copy">Copy</span></button>
+          <pre id="snip-generic"><code>Load the JSON file design.slim.json (a Figma design dump).
+Its top level contains:
+- meta (context about how the file was generated),
+- tokens (design tokens: colors, typography, effects, variables),
+- screens (per-screen summaries with sectionTree and textSummary),
+- components (reusable definitions).
+
+When generating code, mirror token names, respect the
+sectionTree hierarchy, and use textSummary strings verbatim.</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy -->
+    <section id="privacy" class="privacy">
+      <div class="section-head">
+        <h2 data-i18n="priv.title">Zero network. Zero telemetry.</h2>
+        <p data-i18n="priv.sub">One hard guarantee: your design data never leaves your machine.</p>
+      </div>
+      <ul class="priv-list">
+        <li data-i18n="priv.1"><code>networkAccess.allowedDomains: ["none"]</code> declared in manifest. Figma blocks all outbound requests at runtime.</li>
+        <li data-i18n="priv.2">No analytics SDK, no error reporters, no anonymous metrics.</li>
+        <li data-i18n="priv.3">Design data flow: Figma sandbox → plugin UI iframe → <code>&lt;a download&gt;</code> / clipboard. That's the entire surface.</li>
+        <li data-i18n="priv.4">CI validates the zero-network invariant on every PR — it cannot silently regress.</li>
+        <li data-i18n="priv.5">MIT licensed, auditable line-by-line on <a href="https://github.com/mercuryPark/dcl-figma" target="_blank" rel="noopener">GitHub</a>.</li>
+      </ul>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+      <h2 data-i18n="cta.title">Ready to ship Figma context to your LLM?</h2>
+      <p data-i18n="cta.sub">30 seconds to install. Pre-built zip, no build step.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/mercuryPark/dcl-figma/releases/latest" target="_blank" rel="noopener">
+          <span data-i18n="cta.download">Download v0.1.0 .zip</span>
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/mercuryPark/dcl-figma" target="_blank" rel="noopener">
+          <span data-i18n="cta.github">GitHub →</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-col">
+      <div class="footer-brand">dcl-figma</div>
+      <div class="footer-sub" data-i18n="footer.tagline">Figma design context, served to your LLM.</div>
+    </div>
+    <div class="footer-col">
+      <a href="https://github.com/mercuryPark/dcl-figma" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/mercuryPark/dcl-figma/releases" target="_blank" rel="noopener" data-i18n="footer.releases">Releases</a>
+      <a href="https://github.com/mercuryPark/dcl-figma/blob/main/docs/SCHEMA.md" target="_blank" rel="noopener">Schema</a>
+      <a href="https://github.com/mercuryPark/dcl-figma/blob/main/SECURITY.md" target="_blank" rel="noopener">Security</a>
+      <a href="https://github.com/mercuryPark/dcl-figma/issues" target="_blank" rel="noopener">Issues</a>
+    </div>
+    <div class="footer-col legal">
+      <span>MIT License © mercuryPark</span>
+      <span data-i18n="footer.built">Built with zero analytics.</span>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
