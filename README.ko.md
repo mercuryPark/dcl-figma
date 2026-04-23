@@ -1,10 +1,12 @@
 # Design Context for LLMs
 
+[![Live Site](https://img.shields.io/badge/Live-dcl--figma.vercel.app-59E8B5?style=flat&labelColor=0B0B0F)](https://dcl-figma.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](/LICENSE)
 [![Figma Plugin](https://img.shields.io/badge/Figma-Plugin-1E1E1E)](https://www.figma.com/community)
 [![네트워크 접근 없음](https://img.shields.io/badge/Network-Zero-brightgreen)](#프라이버시와-보안)
 
 > **다른 언어로 보기:** [English](/README.md)
+> **랜딩 페이지:** https://dcl-figma.vercel.app/
 
 LLM이 바로 읽을 수 있는 JSON 스냅샷을 Figma 파일에서 추출하는 **무료 오픈소스 Figma 플러그인**입니다. 결과물을 Claude Code / Cursor / GitHub Copilot / Aider 또는 아무 LLM 세션에 붙여 넣으세요. 실제 화면·토큰·컴포넌트 구조를 근거로 LLM이 UI 코드를 생성합니다.
 

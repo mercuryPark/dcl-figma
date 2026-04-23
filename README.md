@@ -1,10 +1,12 @@
 # Design Context for LLMs
 
+[![Live Site](https://img.shields.io/badge/Live-dcl--figma.vercel.app-59E8B5?style=flat&labelColor=0B0B0F)](https://dcl-figma.vercel.app/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](/LICENSE)
 [![Figma Plugin](https://img.shields.io/badge/Figma-Plugin-1E1E1E)](https://www.figma.com/community)
 [![Zero Network](https://img.shields.io/badge/Network-Zero-brightgreen)](#privacy-and-security)
 
 > **Read this in other languages:** [한국어](/README.ko.md)
+> **Landing page:** https://dcl-figma.vercel.app/
 
 A free and open-source **Figma plugin** that extracts a compact, LLM-ready JSON snapshot of your design file. Paste the output into Claude Code, Cursor, GitHub Copilot, Aider, or any LLM session — and let it reason about your actual screens, tokens, and components.
 

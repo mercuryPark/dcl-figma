@@ -5,7 +5,7 @@
   "description": "Free, open-source Figma plugin that extracts a compact, LLM-ready JSON snapshot (Slim + Full) of your design file.",
   "license": "MIT",
   "author": "mercuryPark <mercury@example.com>",
-  "homepage": "https://github.com/mercuryPark/dcl-figma",
+  "homepage": "https://dcl-figma.vercel.app/",
   "repository": {
     "type": "git",
     "url": "https://github.com/mercuryPark/dcl-figma.git"
