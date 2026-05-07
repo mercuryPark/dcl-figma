@@ -48,9 +48,9 @@
     <g font-family="'JetBrains Mono', monospace" font-size="14" fill="#F5F5F4">
       <text x="20" y="70"><tspan fill="#9A9A99">{</tspan></text>
       <text x="36" y="94"><tspan fill="#59E8B5">"$schema"</tspan><tspan fill="#9A9A99">: </tspan><tspan fill="#FF6A3D">"..."</tspan></text>
-      <text x="36" y="118"><tspan fill="#59E8B5">"schemaVersion"</tspan><tspan fill="#9A9A99">: </tspan><tspan fill="#FF6A3D">"2.0"</tspan></text>
+      <text x="36" y="118"><tspan fill="#59E8B5">"schemaVersion"</tspan><tspan fill="#9A9A99">: </tspan><tspan fill="#FF6A3D">"2.1"</tspan></text>
       <text x="36" y="142"><tspan fill="#59E8B5">"meta"</tspan><tspan fill="#9A9A99">: {</tspan></text>
-      <text x="52" y="166"><tspan fill="#59E8B5">"tool"</tspan><tspan fill="#9A9A99">: </tspan><tspan fill="#FF6A3D">"dcl-figma@0.2.0"</tspan></text>
+      <text x="52" y="166"><tspan fill="#59E8B5">"tool"</tspan><tspan fill="#9A9A99">: </tspan><tspan fill="#FF6A3D">"dcl-figma@0.3.0"</tspan></text>
       <text x="52" y="190"><tspan fill="#59E8B5">"stats"</tspan><tspan fill="#9A9A99">: { </tspan><tspan fill="#59E8B5">"totalNodes"</tspan><tspan fill="#9A9A99">: </tspan><tspan fill="#E0C9F5">8335</tspan><tspan fill="#9A9A99"> }</tspan></text>
       <text x="36" y="214"><tspan fill="#9A9A99">},</tspan></text>
       <text x="36" y="238"><tspan fill="#59E8B5">"screens"</tspan><tspan fill="#9A9A99">: [ </tspan><tspan fill="#6C6C70">/* 92 screens */</tspan><tspan fill="#9A9A99"> ],</tspan></text>

@@ -4,9 +4,29 @@ All notable changes to **Design Context for LLMs** are documented here. This pro
 
 > Historical planning notes for the pre-rebrand (잠깐살래 v1 / v2) era live in [`docs/legacy/CHANGELOG.md`](./docs/legacy/CHANGELOG.md).
 
-## [Unreleased]
+## [0.3.0] - 2026-05-07
 
-_Nothing yet._
+> **Schema bumps from `2.0` → `2.1`** (plugin package version is `0.3.0`). This release is additive only: existing 2.0 consumers can ignore the new optional fields and continue reading dumps. See [`docs/SCHEMA.md`](./docs/SCHEMA.md#version-diff-log) for the full 2.1 field list.
+
+### Added
+- **Stroke fidelity**: FRAME-like and VECTOR nodes now preserve `strokeAlign`, `strokeCap`, `strokeJoin`, `strokeDashes`, `strokeMiterLimit`, and asymmetric frame `individualStrokes`.
+- **Paint fidelity**: gradients preserve non-identity `gradientTransform`; image paints preserve `rotation`, `scalingFactor`, and `cropRect` when available.
+- **Text fidelity**: mixed-style text now emits `style.runs[]` for per-range font, size, line-height, letter-spacing, fill, case, and decoration data.
+- **Geometry fidelity**: nodes can emit `renderBox` for shadow/blur-expanded bounds and `relativeTransform` for rotated transforms.
+- **Instance and Variables metadata**: instance overrides get `nodeType` via post-walk enrichment, and variables include optional `scope` plus `codeSyntax`.
+- **Release automation**: tag pushes now run `npm ci`, `verify:all`, allowlisted release zip creation, SHA256 generation, changelog note extraction, and GitHub Release creation.
+- **Fixture coverage**: added tests for stroke pruning, image/gradient detail, mixed text runs, render bounds/transforms, instance post-walk enrichment, variables metadata, UI behavior, prune/slugify/chunk utilities, and frame/text edge cases.
+
+### Changed
+- `schemaVersion` is now `"2.1"` and `$schema` points to `https://dcl-figma.dev/schemas/2.1.json`.
+- Package version is now `0.3.0`; build output and landing-site version text are synced from `package.json`.
+- UI persistence now uses `figma.clientStorage`, with a one-time migration from the previous localStorage payload.
+- `esbuild` upgraded to `0.25.9`.
+- Publish runbook now prefers the automated tag-driven release path and keeps manual zip/release steps as a fallback.
+
+### Fixed
+- Added Cancel and Retry UI paths around dump execution so users can stop or rerun long/erroring dumps without reopening the plugin.
+- Localized ARIA labels and surfaced non-fatal `meta.warnings` for SVG caps/failures, style API errors, and Variables API failures.
 
 ## [0.2.0] - 2026-05-07
 
@@ -62,6 +82,7 @@ _Nothing yet._
 - Distribution via GitHub Releases with a pre-built `dist/` zip — no Figma Community listing in this release.
 - Validated end-to-end on the 잠깐살래 file: 8,335 nodes, 84 components, 15 variables. Slim 64 KB, Full 2.1 MB, no degradation needed.
 
-[Unreleased]: https://github.com/mercuryPark/dcl-figma/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/mercuryPark/dcl-figma/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/mercuryPark/dcl-figma/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/mercuryPark/dcl-figma/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/mercuryPark/dcl-figma/releases/tag/v0.1.0

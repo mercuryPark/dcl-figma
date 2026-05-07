@@ -7,7 +7,7 @@ This document is the canonical narrative description of the JSON emitted by **De
 - `schemaVersion` follows **semver** (`"MAJOR.MINOR"`).
 - Breaking changes (field removed, field renamed, type changed) bump MAJOR.
 - Additive changes (new optional field) bump MINOR.
-- The current version is **2.0** (shipped with plugin v0.2.0). The plugin's package version and the schema version evolve independently — see the **Version diff log** at the bottom for migration notes.
+- The current version is **2.1** (shipped with plugin v0.3.0). The plugin's package version and the schema version evolve independently — see the **Version diff log** at the bottom for migration notes.
 
 ## Top-level envelope (both Slim and Full)
 
@@ -15,8 +15,8 @@ Every dump begins with four "self-documenting" fields so a single file tells its
 
 | Field | Type | Notes |
 |---|---|---|
-| `$schema` | `string` | URL to the published schema for this version (e.g., `https://dcl-figma.dev/schemas/2.0.json`). |
-| `schemaVersion` | `string` | Semver string, currently `"2.0"`. |
+| `$schema` | `string` | URL to the published schema for this version (e.g., `https://dcl-figma.dev/schemas/2.1.json`). |
+| `schemaVersion` | `string` | Semver string, currently `"2.1"`. |
 | `_howToUse` | `string` | One-line English prompt the LLM can read verbatim. |
 | `meta` | `object` | See **Meta**. |
 
@@ -48,19 +48,30 @@ Every node carries `id`, `type`, `name`. Optional fields are omitted when they m
 | Field family | Applies to | Notes |
 |---|---|---|
 | `box` | all | `{ x, y, w, h }`, numbers rounded to 2 decimals. |
+| `renderBox` | all | `{ x, y, w, h }` expanded beyond `box` when visible shadow/blur effects extend the rendered envelope by more than 0.5 px. _(2.1)_ |
 | `visible / opacity / rotation / blendMode / locked` | all | Only emitted when not at Figma's default. |
+| `relativeTransform` | all | 2×3 matrix emitted for rotated nodes so consumers can reproduce off-center transforms. Identity/zero-rotation transforms are omitted. _(2.1)_ |
 | `constraints` | all | `{ horizontal, vertical }` parent-relative resize behavior. Emitted only when ≠ `{ MIN, MIN }`. Values: `MIN` / `MAX` / `CENTER` / `STRETCH` / `SCALE`. _(2.0)_ |
 | `layoutPositioning` | all | `"AUTO"` (default, omitted) or `"ABSOLUTE"` — child opts out of parent's auto-layout flow. _(2.0)_ |
 | `layoutMode / layoutWrap / itemSpacing / counterAxisSpacing / padding*` | FRAME / GROUP / SECTION / COMPONENT / COMPONENT_SET | Auto Layout fields. `layoutWrap` (`"NO_WRAP"` default, omitted; `"WRAP"` emitted) and `counterAxisSpacing` (cross-axis gap on wrap layouts) added in 2.0. |
 | `fills / strokes / effects / cornerRadius / cornerRadii` | FRAME-like, VECTOR, TEXT (fills only) | Normalized paint/effect shapes. `cornerRadii: { tl, tr, br, bl }` is emitted instead of `cornerRadius` when corners differ or `cornerRadius === figma.mixed`. _(2.0)_ |
-| `characters / style` | TEXT | Preserved verbatim — never truncated. `style.letterSpacing` and `style.lineHeight` are unit-aware strings (`"2%"`, `"0.5px"`, `"AUTO"`) when the unit is known; raw `number` is reserved for the unit-unknown fallback. _(2.0 — see migration notes.)_ **Mixed-style runs**: when a single TextNode carries multiple styles across character ranges (`fontSize` / `fontName` / `fills` of type `figma.mixed`), the corresponding `style.*` field is omitted — per-range style is not yet emitted. Tracked for v0.3+. |
-| `mainComponentId / overrides` | INSTANCE | Instance carries an id pointer; the Component's subtree is not recursively nested. `overrides` is `Record<string, { fields: string[]; nodeType?: string }>` — the actual current values for overridden fields are recoverable by looking up the matching child id within `children`. _(2.0 — see migration notes.)_ |
+| `strokeAlign / strokeCap / strokeJoin / strokeDashes / strokeMiterLimit / individualStrokes` | FRAME-like, VECTOR (except `individualStrokes`, FRAME-like only) | Stroke geometry details emitted only when non-default. `individualStrokes` is `{ top, right, bottom, left }` for asymmetric per-side frame strokes. _(2.1)_ |
+| `characters / style` | TEXT | Preserved verbatim — never truncated. `style.letterSpacing` and `style.lineHeight` are unit-aware strings (`"2%"`, `"0.5px"`, `"AUTO"`) when the unit is known; raw `number` is reserved for the unit-unknown fallback. _(2.0 — see migration notes.)_ `style.runs` preserves mixed per-range style overrides for `fontFamily`, `fontStyle`, `fontSize`, `lineHeight`, `letterSpacing`, `fills`, `textCase`, and `textDecoration`. _(2.1)_ |
+| `mainComponentId / overrides` | INSTANCE | Instance carries an id pointer; the Component's subtree is not recursively nested. `overrides` is `Record<string, { fields: string[]; nodeType?: string }>` — the actual current values for overridden fields are recoverable by looking up the matching child id within `children`. Since 2.1, `nodeType` is populated by an in-memory post-walk pass whenever the override id exists in the instance subtree. _(2.0/2.1 — see migration notes.)_ |
 | `children` | FRAME-like, INSTANCE | Figma z-order preserved — no client-side sort. |
 | `origType / svg / svgExportFailed` | VECTOR | `origType` is the original Figma type; `svg` appears only when SVG export was opted in and succeeded. |
 
 ### Vector family
 
 `LINE`, `RECTANGLE`, `ELLIPSE`, `POLYGON`, `STAR`, `BOOLEAN_OPERATION`, `VECTOR` all collapse to `type: "VECTOR"` with `origType` preserving the source.
+
+### Paint detail
+
+| Shape | Fields | Notes |
+|---|---|---|
+| SOLID | `type`, `color`, `opacity?` | `color` is normalized hex (`#rrggbb` or `#rrggbbaa`). |
+| GRADIENT_* | `type`, `stops`, `opacity?`, `gradientTransform?` | `gradientTransform` is a 2×3 matrix and is omitted when it is identity. _(2.1)_ |
+| IMAGE | `type`, `imageHash`, `scaleMode?`, `opacity?`, `rotation?`, `scalingFactor?`, `cropRect?` | `rotation`, `scalingFactor`, and `cropRect: { x, y, w, h }` preserve image transform/crop detail when Figma exposes it. _(2.1)_ |
 
 ## Slim envelope
 
@@ -127,7 +138,7 @@ If none of these brings the byte size ≤ 500KB, the Slim is still emitted with 
 | `colors` | `ColorToken[]` | PaintStyle: `{ id, name, value: Paint[] }`. |
 | `typography` | `TypographyToken[]` | TextStyle: `{ id, name, fontFamily?, fontStyle?, fontSize?, lineHeight?, letterSpacing? }`. `lineHeight` and `letterSpacing` are unit-aware strings (e.g., `"120%"`, `"0.5px"`, `"AUTO"`) when the unit is known. _(2.0 — `letterSpacing` was `number` in 1.0.)_ |
 | `effects` | `EffectToken[]` | EffectStyle: `{ id, name, effects: Effect[] }`. |
-| `variables` | `VariableEntry[]` | See **Variables**. |
+| `variables` | `VariableEntry[]` | See **Variables**. `scope` and `codeSyntax` were added in 2.1. |
 
 ### Variables
 
@@ -141,7 +152,9 @@ One entry per **(Variable × Mode)** pair. Both `modeId` and `modeName` are pres
   "resolvedType": "COLOR",
   "value": "#ff3366",
   "modeId": "1:0",
-  "modeName": "light"
+  "modeName": "light",
+  "scope": ["ALL_SCOPES"],
+  "codeSyntax": { "WEB": "var(--color-primary)" }
 }
 ```
 
@@ -169,6 +182,21 @@ figma.{fileSlug}.{pageSlug}.full.json
 - All-pages dump uses `pageSlug = "all"`.
 
 ## Version diff log
+
+### 2.1 (shipped with plugin v0.3.0)
+
+**Additive only — 2.0 consumers can read 2.1 dumps unchanged.** Consumers that do not understand the fields below can ignore them safely.
+
+- Stroke detail on FRAME-like and VECTOR nodes: `strokeAlign`, `strokeCap`, `strokeJoin`, `strokeDashes`, `strokeMiterLimit`, plus FRAME-like `individualStrokes: { top, right, bottom, left }`.
+- Gradient paints: `gradientTransform?: number[][]` for non-identity 2×3 gradient matrices.
+- Image paints: `rotation`, `scalingFactor`, and `cropRect: { x, y, w, h }`.
+- Mixed text style runs: `TextNode.style.runs[]` with `start`, `end`, `fontFamily`, `fontStyle`, `fontSize`, `lineHeight`, `letterSpacing`, `fills`, `textCase`, and `textDecoration`.
+- Render geometry: `renderBox?: Box` when effects extend the rendered envelope past the layout `box`.
+- Transform fidelity: `relativeTransform?: number[][]` for rotated nodes.
+- Instance override enrichment: `InstanceNode.overrides[id].nodeType` is populated by a post-walk in-memory pass when the id is found in the instance `children` tree.
+- Variables metadata: `VariableEntry.scope?: string[]` and `VariableEntry.codeSyntax?: { WEB?, ANDROID?, iOS? }`.
+
+The `$schema` URL moves from `https://dcl-figma.dev/schemas/2.0.json` to `https://dcl-figma.dev/schemas/2.1.json`. Plugin tool tag updates to `dcl-figma@0.3.0`.
 
 ### 2.0 (shipped with plugin v0.2.0)
 

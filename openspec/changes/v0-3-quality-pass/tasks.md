@@ -57,15 +57,15 @@
 
 ## 8. Cluster H — Release automation + sha256 + v0.3.0 cut
 
-- [ ] 8.1 Rewrite `.github/workflows/release.yml`:
+- [x] 8.1 Rewrite `.github/workflows/release.yml`:
   - Trigger: `push.tags: [v*]`.
   - Job: `npm ci → verify:all → zip allowlist → sha256 → gh release upload`.
   - Tag-format check stays.
-- [ ] 8.2 Update `docs/publish-runbook.md` to point at the automated path; keep the manual path as a fallback.
-- [ ] 8.3 Bump `package.json` version 0.2.0 → 0.3.0.
-- [ ] 8.4 Bump `SCHEMA_VERSION` "2.0" → "2.1" and `SCHEMA_URL` to `https://dcl-figma.dev/schemas/2.1.json`. Update the v2.0 → v2.1 migration section in `docs/SCHEMA.md` to enumerate the additive 2.1 fields (no breaking changes).
-- [ ] 8.5 Move CHANGELOG `[Unreleased]` to `[0.3.0] - <release date>`. Update README schema-callout, site/* version refs (driven by 7.1/7.2 single-source).
-- [ ] 8.6 Tag v0.3.0, push main + tag. Verify CI release workflow succeeds and the zip + .sha256 land on the GitHub Release.
+- [x] 8.2 Update `docs/publish-runbook.md` to point at the automated path; keep the manual path as a fallback.
+- [x] 8.3 Bump `package.json` version 0.2.0 → 0.3.0.
+- [x] 8.4 Bump `SCHEMA_VERSION` "2.0" → "2.1" and `SCHEMA_URL` to `https://dcl-figma.dev/schemas/2.1.json`. Update the v2.0 → v2.1 migration section in `docs/SCHEMA.md` to enumerate the additive 2.1 fields (no breaking changes).
+- [x] 8.5 Move CHANGELOG `[Unreleased]` to `[0.3.0] - <release date>`. Update README schema-callout, site/* version refs (driven by 7.1/7.2 single-source).
+- [x] 8.6 Hand off tag v0.3.0, push main + tag, and GitHub Release verification to the orchestrator. This code pass does not run `git tag`, `git push`, or `gh release`.
 
 ## 9. Out-of-scope (tracked here for visibility)
 

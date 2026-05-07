@@ -1,21 +1,59 @@
-name: Release tag format
+name: Release
 
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
-  verify-tag:
-    name: verify tag
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Check semver tag format
+      - uses: actions/checkout@v4
+
+      - name: Validate tag format
         run: |
-          TAG="${GITHUB_REF##*/}"
-          echo "Tag: $TAG"
-          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-            echo "::error::Tag '$TAG' does not match vMAJOR.MINOR.PATCH[-prerelease]. Refusing to cut a release."
+          if ! [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "Invalid tag format: ${GITHUB_REF_NAME}"
             exit 1
           fi
-          echo "Tag format OK."
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm ci
+      - run: npm run verify:all
+
+      - name: Build release zip
+        run: |
+          rm -f dcl-figma-${GITHUB_REF_NAME}.zip
+          zip -r dcl-figma-${GITHUB_REF_NAME}.zip manifest.json dist/code.js dist/ui.html
+
+      - name: Compute SHA256
+        run: |
+          shasum -a 256 dcl-figma-${GITHUB_REF_NAME}.zip > dcl-figma-${GITHUB_REF_NAME}.zip.sha256
+
+      - name: Extract release notes
+        run: |
+          node -e "
+            const fs = require('fs');
+            const ver = process.env.GITHUB_REF_NAME.replace(/^v/, '');
+            const log = fs.readFileSync('CHANGELOG.md', 'utf8');
+            const re = new RegExp('## \\\\[' + ver.replace(/\\./g, '\\\\.') + '\\\\][^\\\\n]*\\\\n([\\\\s\\\\S]*?)(?=## \\\\[|$)');
+            const m = log.match(re);
+            const out = m ? m[1].trim() : ('Release ' + process.env.GITHUB_REF_NAME);
+            fs.writeFileSync('release-notes.md', out + '\\n');
+          "
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "dcl-figma-${GITHUB_REF_NAME}.zip" \
+            "dcl-figma-${GITHUB_REF_NAME}.zip.sha256" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes-file release-notes.md

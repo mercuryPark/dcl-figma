@@ -75,14 +75,14 @@ figma.{fileSlug}.{pageSlug}.full.json
 
 ```json
 {
-  "$schema": "https://dcl-figma.dev/schemas/2.0.json",
-  "schemaVersion": "2.0",
+  "$schema": "https://dcl-figma.dev/schemas/2.1.json",
+  "schemaVersion": "2.1",
   "_howToUse": "Figma design dump for LLM context. Load this JSON and reference screens[], tokens, and components when generating UI code.",
-  "meta": { "fileKey": "...", "pageId": "...", "generatedAt": "...", "tool": "dcl-figma@0.2.0", "degraded": [] }
+  "meta": { "fileKey": "...", "pageId": "...", "generatedAt": "...", "tool": "dcl-figma@0.3.0", "degraded": [] }
 }
 ```
 
-> **Schema 2.0 vs 1.0 (plugin v0.2.0):** the plugin gained per-corner radii, auto-layout wrap fields, parent-relative constraints, and unit-aware `letterSpacing`. Two breaking type changes — `letterSpacing` becomes `string | number` (e.g., `"2%"`, `"0.5px"`) and `instance.overrides` becomes `Record<string, { fields: string[]; nodeType? }>`. See [`docs/SCHEMA.md`](/docs/SCHEMA.md) for the full migration notes.
+> **Schema 2.1 vs 2.0 (plugin v0.3.0):** additive only, no breaking changes. Adds stroke detail, `gradientTransform`, image crop/rotation, mixed text runs, `renderBox`, `relativeTransform`, instance override `nodeType`, and Variables `scope` / `codeSyntax`. See [`docs/SCHEMA.md`](/docs/SCHEMA.md).
 
 ## Integration snippets
 
@@ -146,12 +146,11 @@ When generating code, mirror token names, respect the `sectionTree` hierarchy, a
 
 We welcome issues, PRs, and new locales. See [`CONTRIBUTING.md`](/CONTRIBUTING.md) for the build, test, and release workflow.
 
-## Roadmap (v0.3+)
+## Roadmap (v0.4+)
 
-- Single-source-of-truth for plugin version (`package.json` ⇄ `src/meta.ts` ⇄ `site/`).
-- Post-walk enrichment that fills in `instance.overrides[id].nodeType`.
 - Per-page split output.
 - Option presets (save / share).
+- Hyperlink data inside text runs.
 - Additional locales (`ja`, `zh`, `es` — contributions welcome).
 - Figma Code Connect integration.
 

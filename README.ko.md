@@ -75,14 +75,14 @@ figma.{fileSlug}.{pageSlug}.full.json
 
 ```json
 {
-  "$schema": "https://dcl-figma.dev/schemas/2.0.json",
-  "schemaVersion": "2.0",
+  "$schema": "https://dcl-figma.dev/schemas/2.1.json",
+  "schemaVersion": "2.1",
   "_howToUse": "Figma design dump for LLM context. Load this JSON and reference screens[], tokens, and components when generating UI code.",
-  "meta": { "fileKey": "...", "pageId": "...", "generatedAt": "...", "tool": "dcl-figma@0.2.0", "degraded": [] }
+  "meta": { "fileKey": "...", "pageId": "...", "generatedAt": "...", "tool": "dcl-figma@0.3.0", "degraded": [] }
 }
 ```
 
-> **Schema 2.0 vs 1.0 (플러그인 v0.2.0):** 개별 코너 반경, auto-layout wrap, 부모 대비 constraints, 단위 인식 `letterSpacing`이 추가되었습니다. 두 가지 호환 불가 타입 변경 — `letterSpacing`이 `string | number`로 바뀌었고 (예: `"2%"`, `"0.5px"`), `instance.overrides`가 `Record<string, { fields: string[]; nodeType? }>` 객체로 바뀌었습니다. 마이그레이션 가이드는 [`docs/SCHEMA.md`](/docs/SCHEMA.md) 참고.
+> **Schema 2.1 vs 2.0 (플러그인 v0.3.0):** 추가 전용이며 breaking 변경은 없습니다. stroke 7종, `gradientTransform`, image crop/rotation, mixed text runs, `renderBox`, `relativeTransform`, instance overrides `nodeType`, Variables `scope`/`codeSyntax`가 추가되었습니다. 자세한 내용은 [`docs/SCHEMA.md`](/docs/SCHEMA.md) 참고.
 
 ## 통합 스니펫
 
@@ -146,12 +146,11 @@ JSON 파일 design.slim.json (Figma 디자인 덤프) 을 로드합니다. 최�
 
 이슈·PR·새로운 locale 기여를 환영합니다. 빌드·테스트·릴리즈 워크플로는 [`CONTRIBUTING.md`](/CONTRIBUTING.md) 참고.
 
-## 로드맵 (v0.3+)
+## 로드맵 (v0.4+)
 
-- 플러그인 버전 단일 소스화(`package.json` ⇄ `src/meta.ts` ⇄ `site/`).
-- Instance overrides의 `nodeType` 자동 보강(post-walk enrichment).
 - 페이지별 분할 출력.
 - 옵션 프리셋 저장/공유.
+- text runs 안의 hyperlink 데이터.
 - 추가 locale (`ja`, `zh`, `es` — PR 환영).
 - Figma Code Connect 통합.
 
