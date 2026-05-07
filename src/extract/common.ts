@@ -1,7 +1,9 @@
 // Helpers shared across extractors: paint/effect normalization, box math.
 
-import type { Paint, Effect, Box } from "../schema";
+import type { Paint, Effect, Box, StrokeAlign, StrokeCap, StrokeJoin, IndividualStrokes } from "../schema";
 import { round2 } from "../util/prune";
+
+const IDENTITY_TRANSFORM = [[1, 0, 0], [0, 1, 0]];
 
 type PaintFigma = {
   type: string;
@@ -9,6 +11,7 @@ type PaintFigma = {
   opacity?: number;
   color?: { r: number; g: number; b: number };
   gradientStops?: ReadonlyArray<{ position: number; color: { r: number; g: number; b: number; a: number } }>;
+  gradientTransform?: ReadonlyArray<ReadonlyArray<number>>;
   imageHash?: string | null;
   scaleMode?: string;
 };
@@ -27,6 +30,91 @@ function rgbaToHex(r: number, g: number, b: number, a?: number): string {
   const base = `#${h(r)}${h(g)}${h(b)}`;
   if (a === undefined || a >= 1) return base;
   return `${base}${h(a)}`;
+}
+
+function normalizeTransform2x3(raw: unknown): number[][] | undefined {
+  if (!Array.isArray(raw) || raw.length !== 2) return undefined;
+  const transform: number[][] = [];
+  for (const row of raw) {
+    if (!Array.isArray(row) || row.length !== 3 || !row.every((v) => typeof v === "number" && Number.isFinite(v))) {
+      return undefined;
+    }
+    transform.push(row.map((v) => {
+      const rounded = round2(v);
+      return Object.is(rounded, -0) ? 0 : rounded;
+    }));
+  }
+  const isIdentity = transform.every((row, rowIndex) => row.every((value, colIndex) => value === IDENTITY_TRANSFORM[rowIndex]?.[colIndex]));
+  return isIdentity ? undefined : transform;
+}
+
+function isStrokeAlign(value: unknown): value is StrokeAlign {
+  return value === "INSIDE" || value === "OUTSIDE" || value === "CENTER";
+}
+
+function isStrokeCap(value: unknown): value is StrokeCap {
+  return value === "NONE" || value === "ROUND" || value === "SQUARE" || value === "ARROW_LINES" || value === "ARROW_EQUILATERAL";
+}
+
+function isStrokeJoin(value: unknown): value is StrokeJoin {
+  return value === "MITER" || value === "BEVEL" || value === "ROUND";
+}
+
+interface StrokeSource {
+  strokeAlign?: unknown;
+  strokeCap?: unknown;
+  strokeJoin?: unknown;
+  strokeDashes?: unknown;
+  dashPattern?: unknown;
+  strokeMiterLimit?: unknown;
+}
+
+export interface StrokeFields {
+  strokeAlign?: StrokeAlign;
+  strokeCap?: StrokeCap;
+  strokeJoin?: StrokeJoin;
+  strokeDashes?: number[];
+  strokeMiterLimit?: number;
+}
+
+export function extractStrokeFields(raw: StrokeSource): StrokeFields {
+  const out: StrokeFields = {};
+  if (isStrokeAlign(raw.strokeAlign) && raw.strokeAlign !== "INSIDE") out.strokeAlign = raw.strokeAlign;
+  if (isStrokeCap(raw.strokeCap) && raw.strokeCap !== "NONE") out.strokeCap = raw.strokeCap;
+  if (isStrokeJoin(raw.strokeJoin) && raw.strokeJoin !== "MITER") out.strokeJoin = raw.strokeJoin;
+
+  const dashes = raw.dashPattern ?? raw.strokeDashes;
+  if (Array.isArray(dashes) && dashes.length > 0 && dashes.every((v) => typeof v === "number" && Number.isFinite(v))) {
+    out.strokeDashes = dashes.map((v) => round2(v));
+  }
+
+  if (typeof raw.strokeMiterLimit === "number" && Number.isFinite(raw.strokeMiterLimit)) {
+    const strokeMiterLimit = round2(raw.strokeMiterLimit);
+    if (strokeMiterLimit !== 4) out.strokeMiterLimit = strokeMiterLimit;
+  }
+  return out;
+}
+
+export function extractIndividualStrokes(raw: {
+  strokeTopWeight?: unknown;
+  strokeRightWeight?: unknown;
+  strokeBottomWeight?: unknown;
+  strokeLeftWeight?: unknown;
+}): IndividualStrokes | undefined {
+  if (
+    typeof raw.strokeTopWeight !== "number" || !Number.isFinite(raw.strokeTopWeight) ||
+    typeof raw.strokeRightWeight !== "number" || !Number.isFinite(raw.strokeRightWeight) ||
+    typeof raw.strokeBottomWeight !== "number" || !Number.isFinite(raw.strokeBottomWeight) ||
+    typeof raw.strokeLeftWeight !== "number" || !Number.isFinite(raw.strokeLeftWeight)
+  ) {
+    return undefined;
+  }
+  const top = round2(raw.strokeTopWeight);
+  const right = round2(raw.strokeRightWeight);
+  const bottom = round2(raw.strokeBottomWeight);
+  const left = round2(raw.strokeLeftWeight);
+  if (top === right && right === bottom && bottom === left) return undefined;
+  return { top, right, bottom, left };
 }
 
 export function normalizePaints(raw: unknown): Paint[] | undefined {
@@ -53,7 +141,10 @@ export function normalizePaints(raw: unknown): Paint[] | undefined {
         position: round2(s.position),
         color: rgbaToHex(s.color.r, s.color.g, s.color.b, s.color.a)
       }));
-      out.push({ type: fig.type, stops });
+      const entry: Paint = { type: fig.type, stops };
+      const gradientTransform = normalizeTransform2x3(fig.gradientTransform);
+      if (gradientTransform) entry.gradientTransform = gradientTransform;
+      out.push(entry);
     } else if (fig.type === "IMAGE") {
       const entry: Paint = {
         type: "IMAGE",

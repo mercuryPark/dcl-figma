@@ -26,10 +26,15 @@ export interface Meta {
 
 export interface Box { x: number; y: number; w: number; h: number; }
 
+export type StrokeAlign = "INSIDE" | "OUTSIDE" | "CENTER";
+export type StrokeCap = "NONE" | "ROUND" | "SQUARE" | "ARROW_LINES" | "ARROW_EQUILATERAL";
+export type StrokeJoin = "MITER" | "BEVEL" | "ROUND";
+export interface IndividualStrokes { top: number; right: number; bottom: number; left: number; }
+
 // Paints: we flatten Figma's Paint into a tool-neutral shape.
 export type Paint =
   | { type: "SOLID"; color: string; opacity?: number }
-  | { type: "GRADIENT_LINEAR" | "GRADIENT_RADIAL" | "GRADIENT_ANGULAR" | "GRADIENT_DIAMOND"; stops: Array<{ position: number; color: string }>; opacity?: number }
+  | { type: "GRADIENT_LINEAR" | "GRADIENT_RADIAL" | "GRADIENT_ANGULAR" | "GRADIENT_DIAMOND"; stops: Array<{ position: number; color: string }>; opacity?: number; gradientTransform?: number[][] }
   | { type: "IMAGE"; imageHash: string; scaleMode?: string; opacity?: number };
 
 export interface Effect {
@@ -79,6 +84,12 @@ export interface FrameLikeNode extends NodeCommon {
   paddingBottom?: number;
   fills?: Paint[];
   strokes?: Paint[];
+  strokeAlign?: StrokeAlign;
+  strokeCap?: StrokeCap;
+  strokeJoin?: StrokeJoin;
+  strokeDashes?: number[];
+  strokeMiterLimit?: number;
+  individualStrokes?: IndividualStrokes;
   effects?: Effect[];
   cornerRadius?: number;
   cornerRadii?: CornerRadii;
@@ -109,6 +120,11 @@ export interface VectorNode extends NodeCommon {
   fills?: Paint[];
   strokes?: Paint[];
   strokeWeight?: number;
+  strokeAlign?: StrokeAlign;
+  strokeCap?: StrokeCap;
+  strokeJoin?: StrokeJoin;
+  strokeDashes?: number[];
+  strokeMiterLimit?: number;
   cornerRadius?: number;
   cornerRadii?: CornerRadii;
   svg?: string;

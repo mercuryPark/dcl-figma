@@ -1,7 +1,7 @@
 // Frame / Group / Section / Component / ComponentSet extraction.
 
 import type { FrameLikeNode } from "../schema";
-import { commonFields, nodeBox, normalizeEffects, normalizePaints } from "./common";
+import { commonFields, extractIndividualStrokes, extractStrokeFields, nodeBox, normalizeEffects, normalizePaints } from "./common";
 import { prune, round2 } from "../util/prune";
 
 export function extractFrameLike(n: SceneNode): Omit<FrameLikeNode, "children"> {
@@ -28,6 +28,16 @@ export function extractFrameLike(n: SceneNode): Omit<FrameLikeNode, "children"> 
     paddingBottom?: number;
     fills?: unknown;
     strokes?: unknown;
+    strokeAlign?: unknown;
+    strokeCap?: unknown;
+    strokeJoin?: unknown;
+    strokeDashes?: unknown;
+    dashPattern?: unknown;
+    strokeMiterLimit?: unknown;
+    strokeTopWeight?: unknown;
+    strokeRightWeight?: unknown;
+    strokeBottomWeight?: unknown;
+    strokeLeftWeight?: unknown;
     effects?: unknown;
     cornerRadius?: number | typeof figma.mixed;
     topLeftRadius?: number;
@@ -54,6 +64,9 @@ export function extractFrameLike(n: SceneNode): Omit<FrameLikeNode, "children"> 
   if (fills) obj.fills = fills;
   const strokes = normalizePaints(any.strokes);
   if (strokes) obj.strokes = strokes;
+  Object.assign(obj, extractStrokeFields(any));
+  const individualStrokes = extractIndividualStrokes(any);
+  if (individualStrokes) obj.individualStrokes = individualStrokes;
   const effects = normalizeEffects(any.effects);
   if (effects) obj.effects = effects;
 

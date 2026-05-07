@@ -1,7 +1,7 @@
 // Vector-family nodes (LINE / RECTANGLE / ELLIPSE / POLYGON / STAR / BOOLEAN_OPERATION / VECTOR).
 
 import type { VectorNode as VectorOut } from "../schema";
-import { commonFields, nodeBox, normalizePaints } from "./common";
+import { commonFields, extractStrokeFields, nodeBox, normalizePaints } from "./common";
 import { round2 } from "../util/prune";
 
 export type VectorFamilyType = VectorOut["origType"];
@@ -28,6 +28,12 @@ export function extractVector(n: SceneNode & { type: VectorFamilyType }): Vector
     fills?: unknown;
     strokes?: unknown;
     strokeWeight?: number | typeof figma.mixed;
+    strokeAlign?: unknown;
+    strokeCap?: unknown;
+    strokeJoin?: unknown;
+    strokeDashes?: unknown;
+    dashPattern?: unknown;
+    strokeMiterLimit?: unknown;
     cornerRadius?: number | typeof figma.mixed;
     topLeftRadius?: number;
     topRightRadius?: number;
@@ -40,6 +46,7 @@ export function extractVector(n: SceneNode & { type: VectorFamilyType }): Vector
   const strokes = normalizePaints(any.strokes);
   if (strokes) out.strokes = strokes;
   if (typeof any.strokeWeight === "number" && any.strokeWeight !== 0) out.strokeWeight = round2(any.strokeWeight);
+  Object.assign(out, extractStrokeFields(any));
   if (typeof any.cornerRadius === "number" && any.cornerRadius !== 0) {
     out.cornerRadius = round2(any.cornerRadius);
   } else if (typeof any.cornerRadius === "symbol" || typeof any.topLeftRadius === "number") {
