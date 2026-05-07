@@ -14,6 +14,9 @@ coverage/
 .nyc_output/
 .cache/
 
+# Release artifacts (uploaded to GitHub Releases, not tracked in git)
+dcl-figma-v*.zip
+
 # Editors
 .vscode/
 .idea/

@@ -60,9 +60,9 @@
 
 ## 9. Release
 
-- [ ] 9.1 Cut a `v0.2.0` git tag.
-- [ ] 9.2 Build the release zip per `docs/publish-runbook.md` (`(cd dist && zip -r ../dcl-figma-v0.2.0.zip .)`).
-- [ ] 9.3 Push `main` and `v0.2.0` tag, then attach the zip to the GitHub Release with the v0.2 changelog excerpt.
+- [x] 9.1 Cut a `v0.2.0` git tag (annotated, points at the docs/runbook fix commit).
+- [x] 9.2 Build the release zip with explicit allowlist: `manifest.json` + `dist/code.js` + `dist/ui.html` (excludes `dist/test/`). Result: `dcl-figma-v0.2.0.zip` (~18 KB).
+- [x] 9.3 Push `main` and `v0.2.0` tag, attach the zip to the GitHub Release with the v0.2 changelog excerpt and migration parser snippet inline. Release: https://github.com/mercuryPark/dcl-figma/releases/tag/v0.2.0.
 - [ ] 9.4 Verify the released zip imports cleanly into Figma Desktop on a sample file (manual — left for the maintainer).
 
 ## 10. Follow-ups (out of scope of this change, tracked for visibility)
