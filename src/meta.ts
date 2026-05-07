@@ -3,7 +3,8 @@
 import { HOW_TO_USE, SCHEMA_URL, SCHEMA_VERSION, TOOL_ID, type Meta } from "./schema";
 
 // Version is injected at build time from package.json. For dev we accept a default.
-const VERSION = "0.1.0";
+// TODO(v0.3): single-source-of-truth refactor — derive from package.json at build time.
+const VERSION = "0.2.0";
 
 export interface MetaInput {
   fileKey: string | null;

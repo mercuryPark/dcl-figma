@@ -1,9 +1,9 @@
-// Output schema v1.0 — types shared by Full and Slim dumps.
+// Output schema v2.0 — types shared by Full and Slim dumps.
 // Keep this file as the single source of truth; `docs/SCHEMA.md` documents the same shape
 // in narrative form and tracks version diffs.
 
-export const SCHEMA_VERSION = "1.0";
-export const SCHEMA_URL = "https://dcl-figma.dev/schemas/1.0.json";
+export const SCHEMA_VERSION = "2.0";
+export const SCHEMA_URL = "https://dcl-figma.dev/schemas/2.0.json";
 export const HOW_TO_USE =
   "Figma design dump for LLM context. Load this JSON and reference screens[], tokens, and components when generating UI code.";
 export const TOOL_ID = "dcl-figma";

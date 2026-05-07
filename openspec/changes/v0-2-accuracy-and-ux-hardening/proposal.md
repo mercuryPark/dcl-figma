@@ -42,7 +42,7 @@ This change ships those fixes together as the v0.2 baseline before promoting the
 ## Impact
 
 - **Code touched** (already implemented, awaiting spec/tasks formalization): `src/code.ts`, `src/extract/{common,frame,instance,text,vector}.ts`, `src/schema.ts`, `src/slim/toSlim.ts`, `src/tokens/styles.ts`, `src/ui/main.ts`, `package.json`, `tsconfig.json`, `CHANGELOG.md`, plus new `scripts/test.mjs` and `src/slim/toSlim.test.ts`.
-- **Schema version**: bump `SCHEMA_VERSION` from `"1.0"` to `"1.1"` (additive new fields; the two BREAKING type changes are scoped to `letterSpacing` and `overrides` and are documented in the changelog).
+- **Schema version**: bump `SCHEMA_VERSION` from `"1.0"` to `"2.0"` and the `$schema` URL to `https://dcl-figma.dev/schemas/2.0.json`. The two BREAKING type changes (`letterSpacing`, `InstanceNode.overrides`) trigger a MAJOR bump per the project's stated semver policy. (See `tasks.md` 10.3 for the deliberation; codex consultation backed the 2.0 decision.)
 - **Package version**: bump `package.json` from `0.1.0` to `0.2.0` and align `src/meta.ts` `VERSION` (currently hardcoded — see future single-source-of-truth task).
 - **Downstream docs**: `docs/SCHEMA.md` must reflect the new fields and the two breaking type changes; `README.md` / `README.ko.md` examples need refresh; `CHANGELOG.md` already updated.
 - **Dependencies**: zero new runtime or dev dependencies. Test harness uses Node's built-in `node:test` plus the existing `esbuild`.

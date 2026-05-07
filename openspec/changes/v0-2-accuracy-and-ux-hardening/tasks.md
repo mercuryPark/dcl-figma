@@ -49,24 +49,24 @@
 - [x] 7.3 `npm run build` produces a bundle under the 500 KB ceiling (current: 38.5 KB).
 - [x] 7.4 `npm run verify:manifest` and `npm run verify:locales` pass.
 
-## 8. Documentation alignment (open)
+## 8. Documentation alignment
 
-- [ ] 8.1 Bump `package.json` version `0.1.0` → `0.2.0`.
-- [ ] 8.2 Bump `src/meta.ts` `VERSION` to match (the hardcoded literal is the current source of truth — a single-source-of-truth refactor is tracked separately and is out of scope here).
-- [ ] 8.3 Bump `SCHEMA_VERSION` constant from `"1.0"` to `"1.1"` in `src/schema.ts`.
-- [ ] 8.4 Update `docs/SCHEMA.md` with the new fields (`counterAxisSpacing`, `layoutWrap`, `constraints`, `layoutPositioning`, `cornerRadii`) and document the two BREAKING type changes (letterSpacing, overrides).
-- [ ] 8.5 Refresh the example outputs in `README.md` and `README.ko.md` to use `dcl-figma@0.2.0` and reflect the new field shapes.
-- [ ] 8.6 Move the `## [Unreleased]` section in `CHANGELOG.md` under a `## [0.2.0]` heading with the release date when tagging.
+- [x] 8.1 Bump `package.json` version `0.1.0` → `0.2.0`.
+- [x] 8.2 Bump `src/meta.ts` `VERSION` to `0.2.0` (the hardcoded literal is the current source of truth — a single-source-of-truth refactor is tracked as 10.2).
+- [x] 8.3 Bump `SCHEMA_VERSION` constant from `"1.0"` to `"2.0"` in `src/schema.ts` (resolution of 10.3 — see below). `$schema` URL also moves to `https://dcl-figma.dev/schemas/2.0.json`.
+- [x] 8.4 Update `docs/SCHEMA.md` with the new fields (`counterAxisSpacing`, `layoutWrap`, `constraints`, `layoutPositioning`, `cornerRadii`), inline Slim layout-hint section, and a 2.0 migration section with code example for `letterSpacing` parsing and `overrides` shape change.
+- [x] 8.5 Refresh the example outputs in `README.md` and `README.ko.md` to use `dcl-figma@0.2.0`, `schemaVersion: "2.0"`, and the new schemas URL. Both READMEs now carry a one-paragraph schema-2.0-vs-1.0 callout linking to the migration notes.
+- [x] 8.6 Move the `## [Unreleased]` section in `CHANGELOG.md` under a `## [0.2.0] - 2026-05-07` heading. Added compare links for `[Unreleased]` and `[0.2.0]`.
 
-## 9. Release (open)
+## 9. Release
 
 - [ ] 9.1 Cut a `v0.2.0` git tag.
-- [ ] 9.2 Build the release zip per `docs/publish-runbook.md`.
-- [ ] 9.3 Attach the zip to the GitHub Release with the v0.2 changelog excerpt.
-- [ ] 9.4 Verify the released zip imports cleanly into Figma Desktop on a sample file.
+- [ ] 9.2 Build the release zip per `docs/publish-runbook.md` (`(cd dist && zip -r ../dcl-figma-v0.2.0.zip .)`).
+- [ ] 9.3 Push `main` and `v0.2.0` tag, then attach the zip to the GitHub Release with the v0.2 changelog excerpt.
+- [ ] 9.4 Verify the released zip imports cleanly into Figma Desktop on a sample file (manual — left for the maintainer).
 
-## 10. Follow-ups (out of scope, tracked here for visibility)
+## 10. Follow-ups (out of scope of this change, tracked for visibility)
 
 - [ ] 10.1 Post-walk enrichment pass that populates `overrides[id].nodeType` from the children subtree (deferred to v0.3 instance-walker overhaul).
 - [ ] 10.2 Single-source-of-truth for version (`package.json` ⇄ `src/meta.ts` ⇄ `site/`).
-- [ ] 10.3 Decide whether `SCHEMA_VERSION` should jump to `"2.0"` instead of `"1.1"` given the two scoped breaking type changes — resolve before tagging.
+- [x] 10.3 **Resolved** — `SCHEMA_VERSION` jumps to `"2.0"` instead of `"1.1"`. Rationale: existing project policy ("breaking → MAJOR"), the `InstanceNode.overrides` reshape is unambiguously breaking for any consumer iterating the old `string[]` shape, and the early adopter pool is small enough that this is the right time to use a clean major bump rather than smuggle breaking changes into a minor bump (codex consult, 2026-05-07).

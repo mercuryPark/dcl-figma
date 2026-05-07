@@ -17,7 +17,7 @@ This change ships those fixes together as the v0.2 baseline so downstream consum
 - Preserve enough Figma layout/text fidelity in both `Full` and `Slim` outputs that an LLM can reconstruct common UI patterns (auto-layout with wrap, per-corner radii, percent-based letter-spacing, parent-relative constraints, absolute-positioned children).
 - Restructure `InstanceNode.overrides` to a typed object shape and remove the per-override `getNodeByIdAsync` cost.
 - Establish a zero-extra-dependency test harness using Node's built-in `node:test` and the existing `esbuild`, plus initial coverage on the Slim transform's layout-hint generation.
-- Bundle the resulting BREAKING type changes (`letterSpacing`, `overrides`) into a single schema bump (`1.0` → `1.1`).
+- Bundle the resulting BREAKING type changes (`letterSpacing`, `overrides`) into a single MAJOR schema bump (`1.0` → `2.0`), matching the project's stated semver policy ("breaking → MAJOR").
 
 **Non-Goals:**
 - We are NOT addressing the full `codex` audit list (e.g., `strokeAlign`, `gradientTransform`, mixed-text textRange, scrim layer detection, COMPONENT_SET variant selection, post-walk override enrichment, single-source version management). Those are explicitly deferred.
@@ -65,7 +65,7 @@ This change ships those fixes together as the v0.2 baseline so downstream consum
 
 ## Risks / Trade-offs
 
-- **[Risk]** External consumers that did `parseFloat(node.style.letterSpacing)` will silently get the leading number (e.g., `2` from `"2%"`) and treat it as pixels. → **Mitigation**: explicit BREAKING entry in `CHANGELOG.md`; schema bump to `1.1`; documented in spec.
+- **[Risk]** External consumers that did `parseFloat(node.style.letterSpacing)` will silently get the leading number (e.g., `2` from `"2%"`) and treat it as pixels. → **Mitigation**: explicit BREAKING entry in `CHANGELOG.md`; MAJOR schema bump to `2.0`; migration parser snippet documented in `docs/SCHEMA.md`.
 - **[Risk]** External consumers that iterated `instance.overrides[id]` as a `string[]` will now get an object and crash. → **Mitigation**: same BREAKING entry; the field name (`fields`) inside the new shape is identical to the conceptual content of the old array, so the migration is `obj.fields` → array.
 - **[Risk]** Layout hints inflate `sectionTree` enough to push more files past the 500KB Slim ceiling, triggering the degradation ladder more often. → **Mitigation**: hints are short (≤30 chars per frame typically); the existing 3-stage ladder absorbs the overage without code changes; we monitor real dumps for degradation regressions.
 - **[Risk]** The asymptotic progress curve never reaches 60% during traversing on small files (it asymptotes to 60% only at infinite `processed`). → **Acceptable**: phase transitions to `collectingStyles` (65%) push it forward; the bar always *advances*, which is the original requirement.
@@ -79,13 +79,13 @@ This release is consumer-facing on the schema only (the plugin itself is the onl
 1. Land the source changes (already implemented locally — 13 files modified, 2 new files).
 2. Bump `package.json` version `0.1.0` → `0.2.0` and `src/meta.ts` `VERSION` to match (see open question on single-source).
 3. Update `docs/SCHEMA.md` to document new fields and the two BREAKING type changes.
-4. Update `README.md` / `README.ko.md` example outputs (currently show `dcl-figma@1.0.0`, should show `0.2.0`).
-5. Update `SCHEMA_VERSION` constant from `"1.0"` to `"1.1"`.
+4. Update `README.md` / `README.ko.md` example outputs (currently show `dcl-figma@1.0.0`, should show `dcl-figma@0.2.0` with `schemaVersion: "2.0"`).
+5. Update `SCHEMA_VERSION` constant from `"1.0"` to `"2.0"` and `SCHEMA_URL` to `https://dcl-figma.dev/schemas/2.0.json`.
 6. Tag `v0.2.0`, build the release zip per `docs/publish-runbook.md`, attach to the GitHub Release.
 7. Rollback strategy: if a regression is found post-tag, revert by re-publishing v0.1.0's zip (the plugin is loaded by users from the Release page, so this is a documentation-level rollback rather than a server-side one).
 
 ## Open Questions
 
-1. Should `SCHEMA_VERSION` jump to `"2.0"` instead of `"1.1"` to flag the two BREAKING type changes? This change picks `"1.1"` because the new fields are additive and the breaking changes are scoped to two specific type slots, but a strict semver reading of "any breaking" → major would justify `"2.0"`. Resolve before tagging.
+1. ~~Should `SCHEMA_VERSION` jump to `"2.0"` instead of `"1.1"`?~~ **Resolved 2026-05-07: 2.0.** Following the project's stated semver policy and a codex consultation that flagged `InstanceNode.overrides` as unambiguously breaking, this change ships `schemaVersion: "2.0"` and the `$schema` URL `https://dcl-figma.dev/schemas/2.0.json`.
 2. Should a future enrichment pass populate `overrides[id].nodeType` automatically (post-walk), or leave it to consumers? If the former, do it as part of the v0.3 instance-walker overhaul tracked separately.
 3. Single-source-of-truth for version (`package.json` ⇄ `src/meta.ts` ⇄ `site/`) is out of scope but a related task should land before v0.2 ships.

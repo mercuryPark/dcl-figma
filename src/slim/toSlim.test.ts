@@ -9,8 +9,8 @@ import type { DesignFull, AnyNode } from "../schema";
 
 function makeFull(children: AnyNode[]): DesignFull {
   return {
-    $schema: "https://example/schemas/1.0.json",
-    schemaVersion: "1.0",
+    $schema: "https://example/schemas/2.0.json",
+    schemaVersion: "2.0",
     _howToUse: "test",
     meta: {
       fileKey: null,

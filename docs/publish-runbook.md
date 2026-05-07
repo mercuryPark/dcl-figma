@@ -44,7 +44,9 @@ git tag vX.Y.Z
 git push origin main vX.Y.Z
 
 # 4. Build the release zip
-(cd dist && zip -r ../dcl-figma-vX.Y.Z.zip .)
+#    The zip must contain `manifest.json` at the root and a `dist/` folder
+#    (matches README's "the folder will contain manifest.json and a dist/ directory").
+zip -r dcl-figma-vX.Y.Z.zip manifest.json dist/
 
 # 5. Publish the GitHub Release with the zip attached
 gh release create vX.Y.Z dcl-figma-vX.Y.Z.zip \

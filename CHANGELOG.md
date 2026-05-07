@@ -6,14 +6,22 @@ All notable changes to **Design Context for LLMs** are documented here. This pro
 
 ## [Unreleased]
 
+_Nothing yet._
+
+## [0.2.0] - 2026-05-07
+
+> **Schema bumps from `1.0` → `2.0`** (plugin package version is `0.2.0`). Two breaking type changes are scoped to `TextNode.style.letterSpacing` / `TypographyToken.letterSpacing` and `InstanceNode.overrides`. See migration notes in [`docs/SCHEMA.md`](./docs/SCHEMA.md#version-diff-log).
+
 ### Added
 - **Layout fidelity**: `counterAxisSpacing`, `layoutWrap` extracted on FrameLikeNode; per-node `constraints` and `layoutPositioning` (only when non-default).
 - **Per-corner radii**: `cornerRadii: { tl, tr, br, bl }` on FrameLikeNode and VectorNode when corners differ (or `cornerRadius` is `figma.mixed`).
 - **Slim section tree layout cues**: each frame line now carries inline hints — `[hstack/vstack, wrap, justify=…, align=…, gap=…, gapY=…, p=…]` — so layout intent survives Slim mode.
+- **Test harness**: zero-dependency `npm test` powered by `node:test` + `esbuild`. Initial coverage on the Slim transform's layout-hint generation, padding shorthand, and tree/text-summary invariants (10 cases).
 
 ### Changed
+- **BREAKING — `schemaVersion` `"1.0"` → `"2.0"`** and `$schema` URL moves to `https://dcl-figma.dev/schemas/2.0.json`.
 - **BREAKING — `TextNode.style.letterSpacing` and `TypographyToken.letterSpacing`** changed from `number` to `string | number`. Unit-aware values are now emitted as `"2%"` or `"0.5px"`; raw `number` is reserved for unit-unknown fallback. Consumers that did arithmetic on this field must now parse the unit suffix.
-- **BREAKING — `InstanceNode.overrides`** changed from `Record<string, string[]>` to `Record<string, { fields: string[]; nodeType?: string }>`. The current values for overridden fields remain recoverable via the matching child id within `children`; this change only restructures the metadata.
+- **BREAKING — `InstanceNode.overrides`** changed from `Record<string, string[]>` to `Record<string, { fields: string[]; nodeType?: string }>`. The current values for overridden fields remain recoverable via the matching child id within `children`; this change only restructures the metadata. The per-override `figma.getNodeByIdAsync` lookup was also removed to eliminate latency on instance-rich pages.
 
 ### Fixed
 - **Progress bar stuck at 0%**: phase-based percentage mapping with an asymptotic curve during the traversing phase — the bar always advances, never overshoots. Phase label additionally shows the running processed-node count during traversal.
@@ -54,5 +62,6 @@ All notable changes to **Design Context for LLMs** are documented here. This pro
 - Distribution via GitHub Releases with a pre-built `dist/` zip — no Figma Community listing in this release.
 - Validated end-to-end on the 잠깐살래 file: 8,335 nodes, 84 components, 15 variables. Slim 64 KB, Full 2.1 MB, no degradation needed.
 
-[Unreleased]: https://github.com/mercuryPark/dcl-figma/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/mercuryPark/dcl-figma/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/mercuryPark/dcl-figma/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/mercuryPark/dcl-figma/releases/tag/v0.1.0
