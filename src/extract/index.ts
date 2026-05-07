@@ -10,6 +10,7 @@ import { extractFrameLike } from "./frame";
 import { extractText } from "./text";
 import { extractInstance } from "./instance";
 import { extractVector, isVectorFamily } from "./vector";
+import { enrichInstanceOverrides } from "./postwalk";
 
 export interface ExtractOptions {
   includeHidden: boolean;
@@ -97,5 +98,6 @@ export async function extractRoots(
     const n = await walk(r, state);
     if (n) out.push(n);
   }
+  for (const n of out) enrichInstanceOverrides(n);
   return { nodes: out, vectors: state.vectorCandidates, processed: state.processed };
 }

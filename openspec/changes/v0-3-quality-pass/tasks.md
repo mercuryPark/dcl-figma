@@ -29,9 +29,9 @@
 
 ## 5. Cluster E — Instance overrides nodeType post-walk enrichment
 
-- [ ] 5.1 In `src/extract/index.ts` (or a new `src/extract/postwalk.ts`), after the main walk completes, traverse each `INSTANCE` subtree, build an `id → type` map from its `children`, and stamp `overrides[id].nodeType` whenever an id matches.
-- [ ] 5.2 Do NOT call `figma.getNodeByIdAsync`. The pass is in-memory only.
-- [ ] 5.3 Add fixture coverage and verify.
+- [x] 5.1 In `src/extract/index.ts` (or a new `src/extract/postwalk.ts`), after the main walk completes, traverse each `INSTANCE` subtree, build an `id → type` map from its `children`, and stamp `overrides[id].nodeType` whenever an id matches.
+- [x] 5.2 Do NOT call `figma.getNodeByIdAsync`. The pass is in-memory only.
+- [x] 5.3 Add fixture coverage and verify.
 
 ## 6. Cluster F — UX hotfixes (cancel/retry/aria/warnings/clientStorage)
 
