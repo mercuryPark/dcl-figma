@@ -40,7 +40,7 @@ function round2Clean(n: number): number {
   return Object.is(rounded, -0) ? 0 : rounded;
 }
 
-function normalizeTransform2x3(raw: unknown): number[][] | undefined {
+export function normalizeTransform2x3(raw: unknown): number[][] | undefined {
   if (!Array.isArray(raw) || raw.length !== 2) return undefined;
   const transform: number[][] = [];
   for (const row of raw) {
@@ -229,10 +229,53 @@ export function nodeBox(n: { x?: number; y?: number; width?: number; height?: nu
   return { x: round2(n.x), y: round2(n.y), w: round2(n.width), h: round2(n.height) };
 }
 
+export function computeRenderBox(box: Box | undefined, effects: Effect[] | undefined): Box | undefined {
+  if (!box || !effects?.length) return undefined;
+
+  let left = 0;
+  let top = 0;
+  let right = 0;
+  let bottom = 0;
+
+  for (const effect of effects) {
+    if (effect.visible === false) continue;
+
+    if (effect.type === "DROP_SHADOW") {
+      const offset = effect.offset ?? { x: 0, y: 0 };
+      const radius = effect.radius ?? 0;
+      const spread = effect.spread ?? 0;
+      left = Math.max(left, Math.max(0, -offset.x + radius + spread));
+      top = Math.max(top, Math.max(0, -offset.y + radius + spread));
+      right = Math.max(right, Math.max(0, offset.x + radius + spread));
+      bottom = Math.max(bottom, Math.max(0, offset.y + radius + spread));
+    } else if (effect.type === "LAYER_BLUR") {
+      const radius = effect.radius ?? 0;
+      left = Math.max(left, radius);
+      top = Math.max(top, radius);
+      right = Math.max(right, radius);
+      bottom = Math.max(bottom, radius);
+    }
+  }
+
+  if (left <= 0.5 && top <= 0.5 && right <= 0.5 && bottom <= 0.5) return undefined;
+
+  const xMin = box.x - left;
+  const yMin = box.y - top;
+  const xMax = box.x + box.w + right;
+  const yMax = box.y + box.h + bottom;
+  return {
+    x: round2Clean(xMin),
+    y: round2Clean(yMin),
+    w: round2Clean(xMax - xMin),
+    h: round2Clean(yMax - yMin)
+  };
+}
+
 interface CommonOut {
   visible?: boolean;
   opacity?: number;
   rotation?: number;
+  relativeTransform?: number[][];
   blendMode?: string;
   locked?: boolean;
   constraints?: { horizontal: string; vertical: string };
@@ -245,12 +288,17 @@ export function commonFields(n: SceneNode): CommonOut {
   const any = n as unknown as {
     opacity?: number;
     rotation?: number;
+    relativeTransform?: unknown;
     blendMode?: string;
     constraints?: { horizontal?: unknown; vertical?: unknown };
     layoutPositioning?: string;
   };
   if (typeof any.opacity === "number" && any.opacity !== 1) out.opacity = round2(any.opacity);
   if (typeof any.rotation === "number" && any.rotation !== 0) out.rotation = round2(any.rotation);
+  if (out.rotation !== undefined) {
+    const relativeTransform = normalizeTransform2x3(any.relativeTransform);
+    if (relativeTransform) out.relativeTransform = relativeTransform;
+  }
   if (typeof any.blendMode === "string" && any.blendMode !== "NORMAL" && any.blendMode !== "PASS_THROUGH") {
     out.blendMode = any.blendMode;
   }

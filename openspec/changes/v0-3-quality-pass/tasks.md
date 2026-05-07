@@ -22,10 +22,10 @@
 
 ## 4. Cluster D — Shadow renderBox + relativeTransform
 
-- [ ] 4.1 Extend `src/schema.ts` NodeCommon with `renderBox?: Box`, `relativeTransform?: number[][]`.
-- [ ] 4.2 Update `src/extract/common.ts#nodeBox` (or a new helper) to compute `renderBox` from `effects` (DROP_SHADOW spread/blur/offset, BACKGROUND_BLUR/LAYER_BLUR radius). Skip when expansion ≤ 0.5 px.
-- [ ] 4.3 Update `commonFields` to extract `relativeTransform` when `rotation !== 0`.
-- [ ] 4.4 Add fixture coverage and verify.
+- [x] 4.1 Extend `src/schema.ts` NodeCommon with `renderBox?: Box`, `relativeTransform?: number[][]`.
+- [x] 4.2 Update `src/extract/common.ts#nodeBox` (or a new helper) to compute `renderBox` from `effects` (DROP_SHADOW spread/blur/offset, BACKGROUND_BLUR/LAYER_BLUR radius). Skip when expansion ≤ 0.5 px.
+- [x] 4.3 Update `commonFields` to extract `relativeTransform` when `rotation !== 0`.
+- [x] 4.4 Add fixture coverage and verify.
 
 ## 5. Cluster E — Instance overrides nodeType post-walk enrichment
 

@@ -26,6 +26,8 @@ function mockVector(overrides: Record<string, unknown> = {}): SceneNode & { type
   } as unknown as SceneNode & { type: "VECTOR" };
 }
 
+const BASE_BOX = { x: 100, y: 200, width: 50, height: 40 };
+
 test("strokeAlign OUTSIDE is preserved on frame-like nodes", () => {
   const out = extractFrameLike(mockFrame({ strokeAlign: "OUTSIDE" }));
   assert.equal(out.strokeAlign, "OUTSIDE");
@@ -167,4 +169,117 @@ test("image paint derives rotation from rotated imageTransform and skips cropRec
     imageHash: "hash-4",
     rotation: 90
   });
+});
+
+test("DROP_SHADOW with positive offset expands renderBox to the right and bottom", () => {
+  const out = extractFrameLike(mockFrame({
+    ...BASE_BOX,
+    effects: [{
+      type: "DROP_SHADOW",
+      offset: { x: 10, y: 10 },
+      radius: 8,
+      spread: 2
+    }]
+  }));
+
+  assert.deepEqual(out.box, { x: 100, y: 200, w: 50, h: 40 });
+  assert.deepEqual(out.renderBox, { x: 100, y: 200, w: 70, h: 60 });
+});
+
+test("DROP_SHADOW with negative offset expands renderBox to the left and top", () => {
+  const out = extractFrameLike(mockFrame({
+    ...BASE_BOX,
+    effects: [{
+      type: "DROP_SHADOW",
+      offset: { x: -5, y: -5 },
+      radius: 4,
+      spread: 0
+    }]
+  }));
+
+  assert.deepEqual(out.renderBox, { x: 91, y: 191, w: 59, h: 49 });
+});
+
+test("INNER_SHADOW does not emit renderBox", () => {
+  const out = extractFrameLike(mockFrame({
+    ...BASE_BOX,
+    effects: [{
+      type: "INNER_SHADOW",
+      offset: { x: 10, y: 10 },
+      radius: 8,
+      spread: 2
+    }]
+  }));
+
+  assert.equal("renderBox" in out, false);
+});
+
+test("subpixel shadow expansion at or below 0.5px omits renderBox", () => {
+  const out = extractFrameLike(mockFrame({
+    ...BASE_BOX,
+    effects: [{
+      type: "DROP_SHADOW",
+      offset: { x: 0, y: 0 },
+      radius: 0.3,
+      spread: 0
+    }]
+  }));
+
+  assert.equal("renderBox" in out, false);
+});
+
+test("LAYER_BLUR expands renderBox on all sides by radius", () => {
+  const out = extractFrameLike(mockFrame({
+    ...BASE_BOX,
+    effects: [{
+      type: "LAYER_BLUR",
+      radius: 10
+    }]
+  }));
+
+  assert.deepEqual(out.renderBox, { x: 90, y: 190, w: 70, h: 60 });
+});
+
+test("multiple effects union into the largest renderBox envelope", () => {
+  const out = extractFrameLike(mockFrame({
+    ...BASE_BOX,
+    effects: [
+      {
+        type: "DROP_SHADOW",
+        offset: { x: 20, y: 0 },
+        radius: 5,
+        spread: 0
+      },
+      {
+        type: "LAYER_BLUR",
+        radius: 10
+      },
+      {
+        type: "DROP_SHADOW",
+        visible: false,
+        offset: { x: -100, y: -100 },
+        radius: 20
+      }
+    ]
+  }));
+
+  assert.deepEqual(out.renderBox, { x: 90, y: 190, w: 85, h: 60 });
+});
+
+test("rotated nodes preserve relativeTransform with round2", () => {
+  const out = extractFrameLike(mockFrame({
+    rotation: 30,
+    relativeTransform: [[0.8660254, -0.5, 10.123], [0.5, 0.8660254, 20.987]]
+  }));
+
+  assert.deepEqual(out.relativeTransform, [[0.87, -0.5, 10.12], [0.5, 0.87, 20.99]]);
+});
+
+test("non-rotated nodes omit relativeTransform", () => {
+  const out = extractFrameLike(mockFrame({
+    rotation: 0,
+    relativeTransform: [[1, 0, 10], [0, 1, 20]]
+  }));
+
+  assert.equal("relativeTransform" in out, false);
 });

@@ -1,7 +1,7 @@
 // Text node extraction — preserve characters verbatim, collect style subset.
 
 import type { TextNode as TextOut } from "../schema";
-import { commonFields, nodeBox, normalizePaints } from "./common";
+import { commonFields, computeRenderBox, nodeBox, normalizeEffects, normalizePaints } from "./common";
 import { round2 } from "../util/prune";
 
 type TextStyleRun = NonNullable<TextOut["style"]["runs"]>[number];
@@ -147,6 +147,7 @@ export async function extractText(n: TextNode): Promise<TextOut> {
     textCase?: string | typeof figma.mixed;
     textDecoration?: string | typeof figma.mixed;
     fills?: unknown;
+    effects?: unknown;
   };
 
   Object.assign(out.style, normalizeFontName(any.fontName));
@@ -163,6 +164,8 @@ export async function extractText(n: TextNode): Promise<TextOut> {
 
   const fills = normalizePaints(any.fills);
   if (fills) out.fills = fills;
+  const renderBox = computeRenderBox(box, normalizeEffects(any.effects));
+  if (renderBox) out.renderBox = renderBox;
 
   const hasMixedStyle = (
     isMixedValue(any.fontName) ||

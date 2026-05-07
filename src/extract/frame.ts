@@ -1,15 +1,16 @@
 // Frame / Group / Section / Component / ComponentSet extraction.
 
 import type { FrameLikeNode } from "../schema";
-import { commonFields, extractIndividualStrokes, extractStrokeFields, nodeBox, normalizeEffects, normalizePaints } from "./common";
+import { commonFields, computeRenderBox, extractIndividualStrokes, extractStrokeFields, nodeBox, normalizeEffects, normalizePaints } from "./common";
 import { prune, round2 } from "../util/prune";
 
 export function extractFrameLike(n: SceneNode): Omit<FrameLikeNode, "children"> {
+  const box = nodeBox(n as { x?: number; y?: number; width?: number; height?: number });
   const obj: FrameLikeNode = prune({
     id: n.id,
     type: n.type as FrameLikeNode["type"],
     name: n.name,
-    box: nodeBox(n as { x?: number; y?: number; width?: number; height?: number }),
+    box,
     ...commonFields(n)
   }) as FrameLikeNode;
 
@@ -68,7 +69,11 @@ export function extractFrameLike(n: SceneNode): Omit<FrameLikeNode, "children"> 
   const individualStrokes = extractIndividualStrokes(any);
   if (individualStrokes) obj.individualStrokes = individualStrokes;
   const effects = normalizeEffects(any.effects);
-  if (effects) obj.effects = effects;
+  if (effects) {
+    obj.effects = effects;
+    const renderBox = computeRenderBox(box, effects);
+    if (renderBox) obj.renderBox = renderBox;
+  }
 
   // Corner radius: figma.mixed (symbol) means corners differ — fall back to per-corner fields.
   if (typeof any.cornerRadius === "number" && any.cornerRadius !== 0) {

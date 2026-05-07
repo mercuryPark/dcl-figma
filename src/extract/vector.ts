@@ -1,7 +1,7 @@
 // Vector-family nodes (LINE / RECTANGLE / ELLIPSE / POLYGON / STAR / BOOLEAN_OPERATION / VECTOR).
 
 import type { VectorNode as VectorOut } from "../schema";
-import { commonFields, extractStrokeFields, nodeBox, normalizePaints } from "./common";
+import { commonFields, computeRenderBox, extractStrokeFields, nodeBox, normalizeEffects, normalizePaints } from "./common";
 import { round2 } from "../util/prune";
 
 export type VectorFamilyType = VectorOut["origType"];
@@ -39,12 +39,15 @@ export function extractVector(n: SceneNode & { type: VectorFamilyType }): Vector
     topRightRadius?: number;
     bottomRightRadius?: number;
     bottomLeftRadius?: number;
+    effects?: unknown;
   };
 
   const fills = normalizePaints(any.fills);
   if (fills) out.fills = fills;
   const strokes = normalizePaints(any.strokes);
   if (strokes) out.strokes = strokes;
+  const renderBox = computeRenderBox(box, normalizeEffects(any.effects));
+  if (renderBox) out.renderBox = renderBox;
   if (typeof any.strokeWeight === "number" && any.strokeWeight !== 0) out.strokeWeight = round2(any.strokeWeight);
   Object.assign(out, extractStrokeFields(any));
   if (typeof any.cornerRadius === "number" && any.cornerRadius !== 0) {

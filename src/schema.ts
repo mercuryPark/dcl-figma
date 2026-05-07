@@ -53,9 +53,11 @@ interface NodeCommon {
   type: string;
   name: string;
   box?: Box;
+  renderBox?: Box;
   visible?: boolean;
   opacity?: number;
   rotation?: number;
+  relativeTransform?: number[][];
   blendMode?: string;
   locked?: boolean;
   // Parent-relative resize behavior. Only emitted when non-default (non MIN/MIN).

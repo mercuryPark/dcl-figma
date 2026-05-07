@@ -3,7 +3,7 @@
 // use `getMainComponentAsync()`. That makes this extractor async.
 
 import type { InstanceNode as InstanceOut } from "../schema";
-import { commonFields, nodeBox, normalizePaints } from "./common";
+import { commonFields, computeRenderBox, nodeBox, normalizeEffects, normalizePaints } from "./common";
 
 export async function extractInstance(n: InstanceNode): Promise<InstanceOut> {
   const out: InstanceOut = {
@@ -20,6 +20,7 @@ export async function extractInstance(n: InstanceNode): Promise<InstanceOut> {
     getMainComponentAsync?: () => Promise<{ id?: string; name?: string } | null>;
     overrides?: ReadonlyArray<{ id: string; overriddenFields: readonly string[] }>;
     fills?: unknown;
+    effects?: unknown;
   };
 
   if (typeof any.getMainComponentAsync === "function") {
@@ -51,6 +52,8 @@ export async function extractInstance(n: InstanceNode): Promise<InstanceOut> {
 
   const fills = normalizePaints(any.fills);
   if (fills) out.fills = fills;
+  const renderBox = computeRenderBox(box, normalizeEffects(any.effects));
+  if (renderBox) out.renderBox = renderBox;
 
   return out;
 }
