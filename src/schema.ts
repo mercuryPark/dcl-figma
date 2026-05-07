@@ -16,6 +16,12 @@ export interface Meta {
   tool: string;
   generatedAt: string;
   degraded: string[];
+  warnings?: {
+    svgFailed: number;
+    svgCapped: number;
+    styleError: string | null;
+    variablesError: boolean;
+  };
   stats: {
     totalNodes: number;
     svgExported: number;

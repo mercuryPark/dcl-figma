@@ -64,12 +64,21 @@
     details { border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; margin-bottom: 12px; }
     details summary { cursor: pointer; color: var(--muted); user-select: none; }
     details[open] summary { color: var(--fg); margin-bottom: 6px; }
+    .action-row { display: flex; gap: 8px; }
     .primary {
       width: 100%; padding: 10px; border-radius: var(--radius);
       background: var(--accent); color: var(--accent-fg); border: 0;
       font-size: 13px; font-weight: 600; cursor: pointer;
     }
+    .action-row .primary { flex: 1; width: auto; }
     .primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .secondary {
+      padding: 10px 12px; border-radius: var(--radius);
+      background: var(--bg); color: var(--fg); border: 1px solid var(--border);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .secondary:hover { border-color: var(--accent); }
+    .hidden { display: none !important; }
     .progress-wrap { margin-top: 12px; }
     .progress-bar {
       height: 6px; background: var(--border); border-radius: 999px; overflow: hidden; margin: 4px 0;
@@ -98,6 +107,11 @@
       padding: 10px; border-radius: var(--radius); margin-top: 12px; display: none;
     }
     .error-banner.active { display: block; }
+    .error-banner button {
+      margin-top: 8px; padding: 6px 10px; border-radius: var(--radius);
+      background: var(--bg); color: var(--fg); border: 1px solid var(--error-border);
+      cursor: pointer; font-size: 12px;
+    }
     .warning-list {
       background: var(--warn-bg); color: var(--warn-fg); border: 1px solid var(--warn-border);
       padding: 8px 10px; border-radius: var(--radius); margin-top: 8px; display: none;
@@ -111,7 +125,7 @@
 <body>
   <header>
     <h1 id="app-title">Design Context for LLMs</h1>
-    <div class="locale-toggle" role="group" aria-label="Language">
+    <div class="locale-toggle" role="group" data-i18n-aria="a11y.localeButton">
       <button type="button" data-locale="en" aria-pressed="true">EN</button>
       <button type="button" data-locale="ko" aria-pressed="false">KO</button>
     </div>
@@ -119,7 +133,7 @@
 
   <p class="subtitle" id="app-subtitle"></p>
 
-  <fieldset>
+  <fieldset data-i18n-aria="a11y.scopeRadio">
     <legend id="scope-legend">Scope</legend>
     <label>
       <input type="radio" name="scope" value="selection" />
@@ -142,17 +156,23 @@
     <label><input type="checkbox" id="opt-tokens" checked /> <span data-i18n="advanced.includeTokens">Include design tokens</span></label>
   </details>
 
-  <button class="primary" id="btn-dump" type="button" data-i18n="actions.dump">Dump</button>
+  <div class="action-row">
+    <button class="primary" id="btn-dump" type="button" data-i18n="actions.dump">Dump</button>
+    <button class="secondary hidden" id="btn-cancel" type="button" data-i18n="actions.cancel" data-i18n-aria="a11y.cancelLabel">Cancel</button>
+  </div>
 
   <div class="progress-wrap" aria-live="polite">
-    <div class="progress-bar" role="progressbar" id="progress-bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Dump progress">
+    <div class="progress-bar" role="progressbar" id="progress-bar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-i18n-aria="a11y.progressLabel">
       <div class="progress-fill" id="progress-fill"></div>
     </div>
     <div class="phase-label" id="phase-label"></div>
   </div>
 
   <div class="warning-list" id="warning-list" aria-live="polite"></div>
-  <div class="error-banner" id="error-banner" role="alert"></div>
+  <div class="error-banner" id="error-banner" role="alert">
+    <div id="error-message"></div>
+    <button class="hidden" type="button" id="btn-retry" data-i18n="actions.retry" data-i18n-aria="a11y.retryLabel">Retry</button>
+  </div>
 
   <div class="results" id="results" aria-live="polite">
     <button type="button" id="btn-download-slim" data-primary="true"></button>

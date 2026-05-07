@@ -13,6 +13,7 @@ export interface MetaInput {
   pageName: string;
   stats: Meta["stats"];
   degraded?: string[];
+  warnings?: Meta["warnings"];
 }
 
 export function buildMeta(input: MetaInput): Meta {
@@ -24,6 +25,7 @@ export function buildMeta(input: MetaInput): Meta {
     tool: `${TOOL_ID}@${VERSION}`,
     generatedAt: new Date().toISOString(),
     degraded: input.degraded ?? [],
+    warnings: input.warnings,
     stats: input.stats
   };
 }

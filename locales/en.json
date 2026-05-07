@@ -17,6 +17,7 @@
   },
   "actions": {
     "dump": "Dump",
+    "cancel": "Cancel",
     "downloadSlim": "Download Slim ({size})",
     "downloadFull": "Download Full ({size})",
     "copySlim": "Copy Slim to Clipboard",
@@ -42,6 +43,8 @@
     "count": "{count} warning{plural}",
     "variablesError": "Variables API unavailable (variables skipped).",
     "svgFailed": "{count} SVG export{plural} failed.",
+    "svgCapped": "{count} SVG candidate{plural} skipped by the export cap.",
+    "styleError": "Styles API unavailable: {error}",
     "degraded": "Slim was reduced to fit 500KB: {stages}"
   },
   "errors": {
@@ -57,6 +60,10 @@
   },
   "a11y": {
     "progressLabel": "Dump progress",
+    "cancelLabel": "Cancel the current dump",
+    "retryLabel": "Retry the previous dump",
+    "localeButton": "Language",
+    "scopeRadio": "Dump scope",
     "languageToggleLabel": "Switch language",
     "advancedToggleLabel": "Show advanced options"
   }

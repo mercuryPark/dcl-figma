@@ -43,7 +43,21 @@ interface InitDoneMsg {
   type: "initDone";
 }
 
-type UiInbound = DumpRequest | CancelMsg | InitDoneMsg;
+interface LoadOptionsMsg {
+  type: "loadOptions";
+}
+
+interface SaveOptionsMsg {
+  type: "saveOptions";
+  payload: unknown;
+}
+
+interface MigrateOptionsMsg {
+  type: "migrateOptions";
+  payload: unknown;
+}
+
+type UiInbound = DumpRequest | CancelMsg | InitDoneMsg | LoadOptionsMsg | SaveOptionsMsg | MigrateOptionsMsg;
 
 function post(msg: Record<string, unknown> | TransportMessage): void {
   figma.ui.postMessage(msg);
@@ -55,6 +69,32 @@ function emitPhase(phase: Phase, extra?: Record<string, unknown>): void {
 
 function emitError(code: "generic" | "transport" | "manifest" | "emptyScope", detail?: string): void {
   post({ type: "error", code, detail });
+}
+
+// --- clientStorage options --------------------------------------------------
+
+function optionsStorageKey(): string {
+  const maybeFileKey = (figma as unknown as { fileKey?: string | null }).fileKey;
+  return `dcfl:options:${maybeFileKey ?? figma.root.name}`;
+}
+
+async function loadOptions(): Promise<void> {
+  let payload: unknown = null;
+  try {
+    payload = (await figma.clientStorage.getAsync(optionsStorageKey())) ?? null;
+  } catch {
+    payload = null;
+  }
+  post({ type: "options", payload });
+}
+
+async function saveOptions(payload: unknown, ack: "optionsSaved" | "optionsMigrated"): Promise<void> {
+  try {
+    await figma.clientStorage.setAsync(optionsStorageKey(), payload);
+  } catch {
+    // clientStorage failures should not affect the dump flow.
+  }
+  post({ type: ack });
 }
 
 // --- roots resolution -------------------------------------------------------
@@ -171,9 +211,11 @@ async function handleDump(req: DumpRequest): Promise<void> {
 
     let tokens: Tokens = { colors: [], typography: [], effects: [], variables: [] };
     let variablesError = false;
+    let styleError = "";
     if (req.includeTokens) {
       emitPhase("collectingStyles");
       const styles = await collectStyles();
+      styleError = styles.error ?? "";
       emitPhase("collectingVariables");
       const vars = await collectVariables();
       variablesError = vars.error;
@@ -187,6 +229,15 @@ async function handleDump(req: DumpRequest): Promise<void> {
 
     emitPhase("exportingSvg");
     const svgResult = await runSvgExport(svgCandidates, { enabled: req.includeSvg });
+    const metaWarnings: Meta["warnings"] | undefined =
+      variablesError || svgResult.failed > 0 || svgResult.capped > 0 || styleError
+        ? {
+            variablesError,
+            svgFailed: svgResult.failed,
+            svgCapped: svgResult.capped,
+            styleError: styleError || null
+          }
+        : undefined;
 
     const meta: Meta = buildMeta({
       fileKey: null, // Plugin API does not expose fileKey directly.
@@ -198,7 +249,8 @@ async function handleDump(req: DumpRequest): Promise<void> {
         svgExported: svgResult.exported,
         svgFailed: svgResult.failed,
         variablesError
-      }
+      },
+      warnings: metaWarnings
     });
 
     const components = await collectAllComponents();
@@ -232,6 +284,8 @@ async function handleDump(req: DumpRequest): Promise<void> {
       warnings: {
         variablesError,
         svgFailed: svgResult.failed,
+        svgCapped: svgResult.capped,
+        styleError,
         degraded: slimResult.degraded
       }
     });
@@ -259,11 +313,21 @@ figma.ui.onmessage = (msg: UiInbound) => {
     case "initDone":
       post({
         type: "context",
+        fileKey: null,
         fileName: figma.root.name,
         pageName: figma.currentPage.name,
         pageId: figma.currentPage.id,
         selectionCount: figma.currentPage.selection.length
       });
+      return;
+    case "loadOptions":
+      void loadOptions();
+      return;
+    case "saveOptions":
+      void saveOptions(msg.payload, "optionsSaved");
+      return;
+    case "migrateOptions":
+      void saveOptions(msg.payload, "optionsMigrated");
       return;
     case "dump":
       handleDump(msg);

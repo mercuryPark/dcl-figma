@@ -9,14 +9,18 @@ export interface StyleCollectionResult {
   colors: ColorToken[];
   typography: TypographyToken[];
   effects: EffectToken[];
+  error: string | null;
 }
 
 export async function collectStyles(): Promise<StyleCollectionResult> {
-  const [paints, texts, effects] = await Promise.all([
-    figma.getLocalPaintStylesAsync().catch(() => []),
-    figma.getLocalTextStylesAsync().catch(() => []),
-    figma.getLocalEffectStylesAsync().catch(() => [])
+  const [paintsResult, textsResult, effectsResult] = await Promise.all([
+    collectStyleList("paint", () => figma.getLocalPaintStylesAsync()),
+    collectStyleList("text", () => figma.getLocalTextStylesAsync()),
+    collectStyleList("effect", () => figma.getLocalEffectStylesAsync())
   ]);
+  const paints = paintsResult.items;
+  const texts = textsResult.items;
+  const effects = effectsResult.items;
 
   const colors: ColorToken[] = [];
   for (const s of paints) {
@@ -56,5 +60,16 @@ export async function collectStyles(): Promise<StyleCollectionResult> {
     if (eff) effectsOut.push({ id: s.id, name: s.name, effects: eff });
   }
 
-  return { colors, typography, effects: effectsOut };
+  const errors = [paintsResult.error, textsResult.error, effectsResult.error].filter((e): e is string => Boolean(e));
+  return { colors, typography, effects: effectsOut, error: errors.length ? errors.join("; ") : null };
+}
+
+async function collectStyleList<T>(kind: string, load: () => Promise<ReadonlyArray<T>>): Promise<{ items: ReadonlyArray<T>; error: string | null }> {
+  try {
+    return { items: await load(), error: null };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.warn(`[tokens/styles] ${kind} styles API failed:`, err);
+    return { items: [], error: `${kind}: ${message}` };
+  }
 }

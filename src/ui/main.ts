@@ -12,6 +12,31 @@ declare const __LOCALES__: Record<string, unknown>;
 
 type Scope = "selection" | "currentPage" | "allPages";
 
+interface DumpRequest {
+  type: "dump";
+  scope: Scope;
+  includeHidden: boolean;
+  includeTokens: boolean;
+  includeSvg: boolean;
+  requestId: string;
+}
+
+interface PersistedOptions {
+  locale?: string;
+  scope?: Scope;
+  includeSvg?: boolean;
+  includeHidden?: boolean;
+  includeTokens?: boolean;
+}
+
+interface WarningState {
+  variablesError: boolean;
+  svgFailed: number;
+  svgCapped: number;
+  styleError: string;
+  degraded: string[];
+}
+
 interface UiState {
   fileKey: string | null;
   fileName: string;
@@ -32,7 +57,7 @@ interface UiState {
   slimFilename: string;
   fullFilename: string;
   dumpRequestId: string | null;
-  warnings: { variablesError: boolean; svgFailed: number; degraded: string[] } | null;
+  warnings: WarningState | null;
 }
 
 const state: UiState = {
@@ -59,6 +84,9 @@ const state: UiState = {
 };
 
 const receive = createReceiveState();
+let lastDumpRequest: DumpRequest | null = null;
+let optionsSyncStarted = false;
+let pendingMigration: { key: string } | null = null;
 
 // --- DOM -------------------------------------------------------------------
 
@@ -80,11 +108,14 @@ const els = {
   optHidden: $("#opt-hidden") as HTMLInputElement,
   optTokens: $("#opt-tokens") as HTMLInputElement,
   btnDump: $("#btn-dump") as HTMLButtonElement,
+  btnCancel: $("#btn-cancel") as HTMLButtonElement,
   progressFill: $("#progress-fill"),
   progressBar: $("#progress-bar"),
   phaseLabel: $("#phase-label"),
   warningList: $("#warning-list"),
   errorBanner: $("#error-banner"),
+  errorMessage: $("#error-message"),
+  btnRetry: $("#btn-retry") as HTMLButtonElement,
   results: $("#results"),
   btnDownloadSlim: $("#btn-download-slim") as HTMLButtonElement,
   btnDownloadFull: $("#btn-download-full") as HTMLButtonElement,
@@ -102,6 +133,10 @@ function applyI18n(): void {
   for (const n of els.i18nNodes) {
     const key = n.getAttribute("data-i18n");
     if (key) n.textContent = t(key);
+  }
+  for (const n of Array.from(document.querySelectorAll<HTMLElement>("[data-i18n-aria]"))) {
+    const key = n.getAttribute("data-i18n-aria");
+    if (key) n.setAttribute("aria-label", t(key));
   }
   els.selectionLabel.textContent = t("scope.selection", { count: state.selectionCount, plural: state.selectionCount === 1 ? "" : "s" });
   els.btnDump.textContent = t("actions.dump");
@@ -142,12 +177,14 @@ window.onmessage = (event: MessageEvent) => {
   const m = msg as { type?: string } & Record<string, unknown>;
 
   if (m.type === "context") {
+    state.fileKey = (m.fileKey as string | null) ?? null;
     state.fileName = (m.fileName as string) ?? "";
     state.pageName = (m.pageName as string) ?? "";
     state.pageId = (m.pageId as string) ?? "";
     state.selectionCount = (m.selectionCount as number) ?? 0;
     applyI18n();
     applySmartDefaults();
+    startOptionsSync();
     return;
   }
 
@@ -164,6 +201,7 @@ window.onmessage = (event: MessageEvent) => {
     // either way the primary button should re-enable so the user is never locked out.
     if (state.phase === "done" || state.phase === "idle") els.btnDump.disabled = false;
     renderProgress();
+    updateCancelVisibility();
     updatePhaseLabel();
     return;
   }
@@ -180,7 +218,7 @@ window.onmessage = (event: MessageEvent) => {
     state.fullBytes = (m.fullBytes as number) ?? 0;
     state.slimFilename = (m.slimFilename as string) ?? "";
     state.fullFilename = (m.fullFilename as string) ?? "";
-    state.warnings = (m.warnings as UiState["warnings"]) ?? null;
+    state.warnings = normalizeWarnings(m.warnings);
     updateResultsLabels();
     renderWarnings();
     return;
@@ -189,6 +227,25 @@ window.onmessage = (event: MessageEvent) => {
   if (m.type === "error") {
     const code = (m.code as string) ?? "generic";
     showError(t(`errors.${code}`));
+    return;
+  }
+
+  if (m.type === "options") {
+    applyPersistedOptions(normalizeOptions(m.payload));
+    applyI18n();
+    return;
+  }
+
+  if (m.type === "optionsMigrated") {
+    if (pendingMigration) {
+      try { localStorage.removeItem(pendingMigration.key); } catch { /* ignore */ }
+      pendingMigration = null;
+    }
+    send({ type: "loadOptions" });
+    return;
+  }
+
+  if (m.type === "optionsSaved") {
     return;
   }
 
@@ -225,6 +282,7 @@ const PHASE_PERCENT = {
 } as const;
 const TRAVERSE_MIN = 25;
 const TRAVERSE_MAX = 60;
+const RUNNING_PHASES = new Set(["loadingPages", "traversing", "collectingStyles", "collectingVariables", "exportingSvg", "buildingSlim", "sending"]);
 
 function renderProgress(): void {
   let pct: number = PHASE_PERCENT[state.phase as keyof typeof PHASE_PERCENT] ?? 0;
@@ -234,6 +292,10 @@ function renderProgress(): void {
   }
   els.progressFill.style.width = `${pct}%`;
   els.progressBar.setAttribute("aria-valuenow", String(pct));
+}
+
+function updateCancelVisibility(): void {
+  els.btnCancel.classList.toggle("hidden", !RUNNING_PHASES.has(state.phase));
 }
 
 function applySmartDefaults(): void {
@@ -252,6 +314,8 @@ function clearResults(): void {
   state.warnings = null;
   els.results.classList.remove("active");
   els.errorBanner.classList.remove("active");
+  els.errorMessage.textContent = "";
+  els.btnRetry.classList.add("hidden");
   els.warningList.classList.remove("active");
   els.warningList.innerHTML = "";
 }
@@ -269,6 +333,8 @@ function renderWarnings(): void {
   const items: string[] = [];
   if (state.warnings.variablesError) items.push(t("warnings.variablesError"));
   if (state.warnings.svgFailed > 0) items.push(t("warnings.svgFailed", { count: state.warnings.svgFailed, plural: state.warnings.svgFailed === 1 ? "" : "s" }));
+  if (state.warnings.svgCapped > 0) items.push(t("warnings.svgCapped", { count: state.warnings.svgCapped, plural: state.warnings.svgCapped === 1 ? "" : "s" }));
+  if (state.warnings.styleError) items.push(t("warnings.styleError", { error: state.warnings.styleError }));
   if (state.warnings.degraded.length > 0) items.push(t("warnings.degraded", { stages: state.warnings.degraded.join(", ") }));
   if (items.length) {
     els.warningList.innerHTML = `<strong>${t("warnings.count", { count: items.length, plural: items.length === 1 ? "" : "s" })}</strong><ul>${items.map((i) => `<li>${escapeHtml(i)}</li>`).join("")}</ul>`;
@@ -276,8 +342,21 @@ function renderWarnings(): void {
   }
 }
 
+function normalizeWarnings(raw: unknown): WarningState | null {
+  if (raw === null || typeof raw !== "object") return null;
+  const source = raw as Partial<WarningState>;
+  return {
+    variablesError: source.variablesError === true,
+    svgFailed: typeof source.svgFailed === "number" ? source.svgFailed : 0,
+    svgCapped: typeof source.svgCapped === "number" ? source.svgCapped : 0,
+    styleError: typeof source.styleError === "string" ? source.styleError : "",
+    degraded: Array.isArray(source.degraded) ? source.degraded.filter((v): v is string => typeof v === "string") : []
+  };
+}
+
 function showError(msg: string): void {
-  els.errorBanner.textContent = msg;
+  els.errorMessage.textContent = msg;
+  els.btnRetry.classList.toggle("hidden", !lastDumpRequest);
   els.errorBanner.classList.add("active");
   els.btnDump.disabled = false;
 }
@@ -339,26 +418,49 @@ els.optTokens.addEventListener("change", () => { state.includeTokens = els.optTo
 
 els.btnDump.addEventListener("click", () => {
   if (els.btnDump.disabled) return;
-  els.btnDump.disabled = true;
-  clearResults();
-  state.processed = 0;
-  state.phase = "loadingPages";
-  renderProgress();
-  updatePhaseLabel();
-  state.dumpRequestId = String(Date.now());
-  receive.buffers.slim.length = 0;
-  receive.buffers.full.length = 0;
-  receive.completed.slim = false;
-  receive.completed.full = false;
-  send({
+  startDump(buildDumpRequest());
+});
+
+els.btnCancel.addEventListener("click", () => {
+  send({ type: "cancel" });
+});
+
+els.btnRetry.addEventListener("click", () => {
+  if (!lastDumpRequest) return;
+  startDump(lastDumpRequest);
+});
+
+function buildDumpRequest(): DumpRequest {
+  return {
     type: "dump",
     scope: state.scope,
     includeHidden: state.includeHidden,
     includeTokens: state.includeTokens,
     includeSvg: state.includeSvg,
-    requestId: state.dumpRequestId
-  });
-});
+    requestId: String(Date.now())
+  };
+}
+
+function resetReceiveBuffers(): void {
+  receive.buffers.slim.length = 0;
+  receive.buffers.full.length = 0;
+  receive.completed.slim = false;
+  receive.completed.full = false;
+}
+
+function startDump(request: DumpRequest): void {
+  els.btnDump.disabled = true;
+  clearResults();
+  state.processed = 0;
+  state.phase = "loadingPages";
+  renderProgress();
+  updateCancelVisibility();
+  updatePhaseLabel();
+  state.dumpRequestId = request.requestId;
+  lastDumpRequest = request;
+  resetReceiveBuffers();
+  send(request);
+}
 
 els.btnDownloadSlim.addEventListener("click", () => {
   if (state.slim) downloadText(state.slimFilename, state.slim);
@@ -375,28 +477,25 @@ els.btnCopySlim.addEventListener("click", () => {
 });
 
 // --- clientStorage persistence (per-file) ---------------------------------
-// The sandbox owns clientStorage access; UI sends intent messages, but for v1.0 we
-// store UI preferences in localStorage keyed by fileKey+fileName pseudo id.
-// (figma.clientStorage is only reachable from the sandbox; when the sandbox exposes it
-// we mirror here.)
+// The sandbox owns clientStorage access; UI sends intent messages and only touches
+// localStorage once to migrate v0.2 per-file preferences.
 
 function optionsKey(): string {
-  return `dcfl:options:${state.fileName}`;
+  return `dcfl:options:${state.fileKey ?? state.fileName}`;
+}
+
+function serializeOptions(): PersistedOptions {
+  return {
+    locale: getCurrentLocale(),
+    scope: state.scope,
+    includeSvg: state.includeSvg,
+    includeHidden: state.includeHidden,
+    includeTokens: state.includeTokens
+  };
 }
 
 function persistOptions(): void {
-  try {
-    localStorage.setItem(
-      optionsKey(),
-      JSON.stringify({
-        locale: getCurrentLocale(),
-        scope: state.scope,
-        includeSvg: state.includeSvg,
-        includeHidden: state.includeHidden,
-        includeTokens: state.includeTokens
-      })
-    );
-  } catch { /* quota / disabled — ignore */ }
+  send({ type: "saveOptions", payload: serializeOptions() });
 }
 
 function getCurrentLocale(): string {
@@ -404,25 +503,57 @@ function getCurrentLocale(): string {
   return pressed?.getAttribute("data-locale") ?? "en";
 }
 
-function loadPersisted(): void {
-  try {
-    const raw = localStorage.getItem(optionsKey());
-    if (!raw) return;
-    const parsed = JSON.parse(raw) as Partial<{
-      locale: string; scope: Scope; includeSvg: boolean; includeHidden: boolean; includeTokens: boolean;
-    }>;
-    if (parsed.scope) state.scope = parsed.scope;
-    if (typeof parsed.includeSvg === "boolean") { state.includeSvg = parsed.includeSvg; els.optSvg.checked = parsed.includeSvg; }
-    if (typeof parsed.includeHidden === "boolean") { state.includeHidden = parsed.includeHidden; els.optHidden.checked = parsed.includeHidden; }
-    if (typeof parsed.includeTokens === "boolean") { state.includeTokens = parsed.includeTokens; els.optTokens.checked = parsed.includeTokens; }
-    if (parsed.locale && availableLocales().includes(parsed.locale)) {
-      setLocale(parsed.locale);
-      for (const b of els.localeButtons) {
-        b.setAttribute("aria-pressed", b.getAttribute("data-locale") === parsed.locale ? "true" : "false");
-      }
+function normalizeOptions(raw: unknown): PersistedOptions | null {
+  if (raw === null || typeof raw !== "object") return null;
+  const source = raw as Partial<PersistedOptions>;
+  const out: PersistedOptions = {};
+  if (typeof source.locale === "string") out.locale = source.locale;
+  if (source.scope === "selection" || source.scope === "currentPage" || source.scope === "allPages") out.scope = source.scope;
+  if (typeof source.includeSvg === "boolean") out.includeSvg = source.includeSvg;
+  if (typeof source.includeHidden === "boolean") out.includeHidden = source.includeHidden;
+  if (typeof source.includeTokens === "boolean") out.includeTokens = source.includeTokens;
+  return Object.keys(out).length ? out : null;
+}
+
+function applyPersistedOptions(parsed: PersistedOptions | null): void {
+  if (!parsed) return;
+  if (parsed.scope) state.scope = parsed.scope;
+  if (typeof parsed.includeSvg === "boolean") { state.includeSvg = parsed.includeSvg; els.optSvg.checked = parsed.includeSvg; }
+  if (typeof parsed.includeHidden === "boolean") { state.includeHidden = parsed.includeHidden; els.optHidden.checked = parsed.includeHidden; }
+  if (typeof parsed.includeTokens === "boolean") { state.includeTokens = parsed.includeTokens; els.optTokens.checked = parsed.includeTokens; }
+  if (parsed.locale && availableLocales().includes(parsed.locale)) {
+    setLocale(parsed.locale);
+    for (const b of els.localeButtons) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-locale") === parsed.locale ? "true" : "false");
     }
-    for (const r of els.scopeRadios) r.checked = r.value === state.scope;
+  }
+  for (const r of els.scopeRadios) r.checked = r.value === state.scope;
+}
+
+function readLegacyOptions(): { key: string; payload: PersistedOptions } | null {
+  try {
+    const key = optionsKey();
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const payload = normalizeOptions(JSON.parse(raw));
+    if (!payload) return null;
+    return { key, payload };
   } catch { /* ignore corrupt JSON */ }
+  return null;
+}
+
+function startOptionsSync(): void {
+  if (optionsSyncStarted) return;
+  optionsSyncStarted = true;
+  const legacy = readLegacyOptions();
+  if (legacy) {
+    applyPersistedOptions(legacy.payload);
+    applyI18n();
+    pendingMigration = { key: legacy.key };
+    send({ type: "migrateOptions", payload: legacy.payload });
+    return;
+  }
+  send({ type: "loadOptions" });
 }
 
 // --- init ------------------------------------------------------------------
@@ -433,8 +564,8 @@ function init(): void {
   for (const b of els.localeButtons) {
     b.setAttribute("aria-pressed", b.getAttribute("data-locale") === detected ? "true" : "false");
   }
-  loadPersisted();
   applyI18n();
+  updateCancelVisibility();
   send({ type: "initDone" });
 }
 

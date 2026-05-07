@@ -35,12 +35,12 @@
 
 ## 6. Cluster F — UX hotfixes (cancel/retry/aria/warnings/clientStorage)
 
-- [ ] 6.1 Add a Cancel button to `src/ui.html` and wire it in `src/ui/main.ts` to send `{type: "cancel"}` and hide on `idle/done`.
-- [ ] 6.2 Add a Retry button to the error banner that re-sends the previous `dump` payload.
-- [ ] 6.3 Move all `aria-label` strings to `data-i18n` keys; ensure `verify:locales` continues to pass.
-- [ ] 6.4 Surface `meta.warnings` (svgFailed, svgCapped, styleError, variablesError) in the warning panel.
-- [ ] 6.5 Replace `localStorage` persistence with a sandbox round-trip to `figma.clientStorage`. Implement a one-time migration: read the v0.2 localStorage payload if present, send it to sandbox, delete localStorage on ack.
-- [ ] 6.6 Verify `npm test` (UI bits via fixture wherever possible) and run the build.
+- [x] 6.1 Add a Cancel button to `src/ui.html` and wire it in `src/ui/main.ts` to send `{type: "cancel"}` and hide on `idle/done`.
+- [x] 6.2 Add a Retry button to the error banner that re-sends the previous `dump` payload.
+- [x] 6.3 Move all `aria-label` strings to `data-i18n` keys; ensure `verify:locales` continues to pass.
+- [x] 6.4 Surface `meta.warnings` (svgFailed, svgCapped, styleError, variablesError) in the warning panel.
+- [x] 6.5 Replace `localStorage` persistence with a sandbox round-trip to `figma.clientStorage`. Implement a one-time migration: read the v0.2 localStorage payload if present, send it to sandbox, delete localStorage on ack.
+- [x] 6.6 Verify `npm test` (UI bits via fixture wherever possible) and run the build.
 
 ## 7. Cluster G — Single-source version + esbuild upgrade + fixture coverage
 

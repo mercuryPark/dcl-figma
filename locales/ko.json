@@ -17,6 +17,7 @@
   },
   "actions": {
     "dump": "덤프",
+    "cancel": "취소",
     "downloadSlim": "Slim 다운로드 ({size})",
     "downloadFull": "Full 다운로드 ({size})",
     "copySlim": "Slim 클립보드 복사",
@@ -42,6 +43,8 @@
     "count": "경고 {count}개{plural}",
     "variablesError": "Variables API 사용 불가 (건너뜀).",
     "svgFailed": "SVG export {count}건{plural} 실패.",
+    "svgCapped": "SVG export cap으로 {count}개 후보{plural}를 건너뛰었습니다.",
+    "styleError": "Styles API 사용 불가: {error}",
     "degraded": "Slim이 500KB에 맞게 축소되었습니다: {stages}"
   },
   "errors": {
@@ -57,6 +60,10 @@
   },
   "a11y": {
     "progressLabel": "덤프 진행 상태",
+    "cancelLabel": "현재 덤프 취소",
+    "retryLabel": "이전 덤프 다시 시도",
+    "localeButton": "언어",
+    "scopeRadio": "덤프 범위",
     "languageToggleLabel": "언어 전환",
     "advancedToggleLabel": "고급 옵션 열기"
   }
