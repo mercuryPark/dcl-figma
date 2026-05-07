@@ -25,6 +25,7 @@
   ],
   "scripts": {
     "build": "node build.mjs",
+    "sync:site-version": "node scripts/sync-site-version.mjs",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/test.mjs",
     "verify:locales": "node scripts/verify-locales.mjs",
@@ -35,7 +36,7 @@
   "devDependencies": {
     "@figma/plugin-typings": "1.110.0",
     "@types/node": "22.7.4",
-    "esbuild": "0.24.0",
+    "esbuild": "0.25.9",
     "typescript": "5.6.2"
   },
   "engines": {

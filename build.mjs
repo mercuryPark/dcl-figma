@@ -16,6 +16,15 @@ const SRC = join(ROOT, "src");
 const LOCALES_DIR = join(ROOT, "locales");
 const UI_HTML_TEMPLATE = join(ROOT, "src", "ui.html");
 
+async function loadPackageVersion() {
+  const raw = await readFile(join(ROOT, "package.json"), "utf8");
+  const pkg = JSON.parse(raw);
+  if (!pkg || typeof pkg.version !== "string" || !pkg.version) {
+    throw new Error("[build] package.json#version must be a non-empty string.");
+  }
+  return pkg.version;
+}
+
 async function loadLocales() {
   const files = await readdir(LOCALES_DIR).catch(() => []);
   const bundle = {};
@@ -28,7 +37,7 @@ async function loadLocales() {
   return bundle;
 }
 
-async function bundleCode() {
+async function bundleCode(version) {
   await build({
     entryPoints: [join(SRC, "code.ts")],
     bundle: true,
@@ -39,11 +48,14 @@ async function bundleCode() {
     sourcemap: false,
     minify: false,
     legalComments: "none",
+    define: {
+      "__PACKAGE_VERSION__": JSON.stringify(version)
+    },
     logLevel: "info"
   });
 }
 
-async function bundleUi(locales) {
+async function bundleUi(locales, version) {
   const result = await build({
     entryPoints: [join(SRC, "ui", "main.ts")],
     bundle: true,
@@ -55,6 +67,7 @@ async function bundleUi(locales) {
     minify: false,
     legalComments: "none",
     define: {
+      "__PACKAGE_VERSION__": JSON.stringify(version),
       "__LOCALES__": JSON.stringify(locales)
     },
     logLevel: "info"
@@ -71,9 +84,10 @@ async function main() {
     console.error(`[build] src/ does not exist at ${SRC}. Run from the repo root.`);
     process.exit(1);
   }
+  const version = await loadPackageVersion();
   const locales = await loadLocales();
-  await bundleCode();
-  await bundleUi(locales);
+  await bundleCode(version);
+  await bundleUi(locales, version);
   console.log(`[build] ok. dist/code.js + dist/ui.html written.`);
 }
 

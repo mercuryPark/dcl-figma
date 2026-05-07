@@ -155,3 +155,35 @@ test("empty text omits runs even when style fields are mixed", async () => {
   assert.equal(calls, 0);
   assert.equal("runs" in out.style, false);
 });
+
+test("top-level letterSpacing preserves percent units", async () => {
+  const out = await extractText(mockText({
+    letterSpacing: { unit: "PERCENT", value: -1.234 }
+  }));
+
+  assert.equal(out.style.letterSpacing, "-1.23%");
+});
+
+test("top-level letterSpacing preserves pixel units", async () => {
+  const out = await extractText(mockText({
+    letterSpacing: { unit: "PIXELS", value: 1.235 }
+  }));
+
+  assert.equal(out.style.letterSpacing, "1.24px");
+});
+
+test("unknown letterSpacing units fall back to rounded numbers", async () => {
+  const out = await extractText(mockText({
+    letterSpacing: { unit: "EM", value: 0.333 }
+  }));
+
+  assert.equal(out.style.letterSpacing, 0.33);
+});
+
+test("invalid letterSpacing shapes are omitted", async () => {
+  const out = await extractText(mockText({
+    letterSpacing: { unit: "PIXELS", value: "1" }
+  }));
+
+  assert.equal("letterSpacing" in out.style, false);
+});

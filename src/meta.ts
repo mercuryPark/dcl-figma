@@ -2,9 +2,10 @@
 
 import { HOW_TO_USE, SCHEMA_URL, SCHEMA_VERSION, TOOL_ID, type Meta } from "./schema";
 
-// Version is injected at build time from package.json. For dev we accept a default.
-// TODO(v0.3): single-source-of-truth refactor — derive from package.json at build time.
-const VERSION = "0.2.0";
+declare const __PACKAGE_VERSION__: string;
+
+// Version is injected at build time from package.json.
+const VERSION: string = typeof __PACKAGE_VERSION__ !== "undefined" ? __PACKAGE_VERSION__ : "0.0.0-dev";
 
 export interface MetaInput {
   fileKey: string | null;

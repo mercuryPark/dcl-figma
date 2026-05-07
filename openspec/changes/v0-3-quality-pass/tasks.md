@@ -44,16 +44,16 @@
 
 ## 7. Cluster G — Single-source version + esbuild upgrade + fixture coverage
 
-- [ ] 7.1 In `build.mjs`, read `package.json#version` and inject as `__PACKAGE_VERSION__` into both sandbox and UI bundles. Update `src/meta.ts` to consume it via `declare const __PACKAGE_VERSION__: string` with the existing literal as a dev fallback.
-- [ ] 7.2 Add a small `scripts/sync-site-version.mjs` (or extend `build.mjs`) that emits `site/version.json` and have `site/app.js` read it for hero/CTA labels. Remove hardcoded `0.2.0` strings from `site/*`.
-- [ ] 7.3 Upgrade `esbuild` 0.24.0 → 0.25.x in `package.json`. Update `package-lock.json`. Run `npm run verify:all`.
-- [ ] 7.4 Extend fixture tests:
+- [x] 7.1 In `build.mjs`, read `package.json#version` and inject as `__PACKAGE_VERSION__` into both sandbox and UI bundles. Update `src/meta.ts` to consume it via `declare const __PACKAGE_VERSION__: string` with a dev fallback.
+- [x] 7.2 Add a small `scripts/sync-site-version.mjs` that syncs `site/index.html`, `site/app.js`, and `site/og-image.svg` release version strings from `package.json#version` without touching schema refs.
+- [x] 7.3 Upgrade `esbuild` 0.24.0 → 0.25.x in `package.json`. Update `package-lock.json`. Run `npm run verify:all`.
+- [x] 7.4 Extend fixture tests:
   - `src/util/prune.test.ts`: prune defaults + round2 edge cases.
   - `src/util/slugify.test.ts`: ASCII / Hangul / fallback cases.
   - `src/transport/chunk.test.ts`: split + reassemble round-trip, multi-kind interleaving.
   - `src/extract/text.test.ts`: letterSpacing % vs px vs unknown branches.
   - `src/extract/frame.test.ts`: cornerRadii (mixed / per-corner / all-zero).
-- [ ] 7.5 Verify.
+- [x] 7.5 Verify.
 
 ## 8. Cluster H — Release automation + sha256 + v0.3.0 cut
 

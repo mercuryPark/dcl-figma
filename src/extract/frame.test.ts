@@ -283,3 +283,52 @@ test("non-rotated nodes omit relativeTransform", () => {
 
   assert.equal("relativeTransform" in out, false);
 });
+
+test("mixed cornerRadius emits per-corner radii", () => {
+  const out = extractFrameLike(mockFrame({
+    cornerRadius: Symbol("figma.mixed"),
+    topLeftRadius: 1.234,
+    topRightRadius: 2,
+    bottomRightRadius: 3,
+    bottomLeftRadius: 4
+  }));
+
+  assert.deepEqual(out.cornerRadii, { tl: 1.23, tr: 2, br: 3, bl: 4 });
+  assert.equal("cornerRadius" in out, false);
+});
+
+test("per-corner radii emit without a mixed cornerRadius sentinel", () => {
+  const out = extractFrameLike(mockFrame({
+    topLeftRadius: 0,
+    topRightRadius: 8,
+    bottomRightRadius: 8,
+    bottomLeftRadius: 0
+  }));
+
+  assert.deepEqual(out.cornerRadii, { tl: 0, tr: 8, br: 8, bl: 0 });
+});
+
+test("all-zero per-corner radii are omitted", () => {
+  const out = extractFrameLike(mockFrame({
+    cornerRadius: Symbol("figma.mixed"),
+    topLeftRadius: 0,
+    topRightRadius: 0,
+    bottomRightRadius: 0,
+    bottomLeftRadius: 0
+  }));
+
+  assert.equal("cornerRadii" in out, false);
+});
+
+test("uniform non-zero cornerRadius emits the compact field", () => {
+  const out = extractFrameLike(mockFrame({
+    cornerRadius: 12.345,
+    topLeftRadius: 1,
+    topRightRadius: 2,
+    bottomRightRadius: 3,
+    bottomLeftRadius: 4
+  }));
+
+  assert.equal(out.cornerRadius, 12.35);
+  assert.equal("cornerRadii" in out, false);
+});
