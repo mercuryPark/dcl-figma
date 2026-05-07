@@ -1,5 +1,5 @@
 // Style token collection — Paint / Text / Effect styles via Async APIs only.
-// Grid styles are not surfaced in v1.0 (LLMs rarely need grid metadata).
+// Grid styles are intentionally not surfaced (LLMs rarely need grid metadata).
 
 import type { ColorToken, EffectToken, TypographyToken } from "../schema";
 import { normalizeEffects, normalizePaints } from "../extract/common";

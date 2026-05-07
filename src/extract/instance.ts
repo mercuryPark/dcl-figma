@@ -40,8 +40,8 @@ export async function extractInstance(n: InstanceNode): Promise<InstanceOut> {
   // per instance, accumulating heavy latency on instance-rich pages. The override target's
   // current field values, name, and type are all already present in this instance's `children`
   // subtree (the walker extracted them). Consumers resolve `overrides[id]` by locating the
-  // matching id within `children`. The optional `nodeType` field on InstanceOverride is
-  // reserved for a future post-walk enrichment pass.
+  // matching id within `children`. The optional `nodeType` is filled in by
+  // `enrichInstanceOverrides` (src/extract/postwalk.ts) after the main walk completes.
   if (any.overrides && any.overrides.length) {
     const o: Record<string, { fields: string[]; nodeType?: string }> = {};
     for (const entry of any.overrides) {
