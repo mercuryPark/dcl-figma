@@ -108,6 +108,20 @@ export interface TextNode extends NodeCommon {
     lineHeight?: string | number;
     // Stringified with unit suffix when known ("4%" or "0.5px"); raw number is fallback only.
     letterSpacing?: string | number;
+    // Per-character-range style overrides. When present, run fields take precedence;
+    // top-level fields remain a fallback for uniform properties.
+    runs?: Array<{
+      start: number;
+      end: number;
+      fontFamily?: string;
+      fontStyle?: string;
+      fontSize?: number;
+      lineHeight?: string | number;
+      letterSpacing?: string | number;
+      fills?: Paint[];
+      textCase?: string;
+      textDecoration?: string;
+    }>;
     textCase?: string;
     textDecoration?: string;
   };

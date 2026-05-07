@@ -15,10 +15,10 @@
 
 ## 3. Cluster C — Mixed text runs (textRange)
 
-- [ ] 3.1 Extend `src/schema.ts` `TextNode.style` with `runs?: Array<{ start, end, fontFamily?, fontStyle?, fontSize?, lineHeight?, letterSpacing?, fills?, textCase?, textDecoration? }>`.
-- [ ] 3.2 Update `src/extract/text.ts` to detect `figma.mixed` style fields, call `node.getStyledTextSegments(...)` for the union of mixed properties, collapse adjacent identical runs, and emit `style.runs`.
-- [ ] 3.3 Top-level `style.*` fields stay populated for non-mixed runs (do not regress single-style text).
-- [ ] 3.4 Add fixture coverage and verify.
+- [x] 3.1 Extend `src/schema.ts` `TextNode.style` with `runs?: Array<{ start, end, fontFamily?, fontStyle?, fontSize?, lineHeight?, letterSpacing?, fills?, textCase?, textDecoration? }>`.
+- [x] 3.2 Update `src/extract/text.ts` to detect `figma.mixed` style fields, call `node.getStyledTextSegments(...)` for the union of mixed properties, collapse adjacent identical runs, and emit `style.runs`.
+- [x] 3.3 Top-level `style.*` fields stay populated for non-mixed runs (do not regress single-style text).
+- [x] 3.4 Add fixture coverage and verify.
 
 ## 4. Cluster D — Shadow renderBox + relativeTransform
 

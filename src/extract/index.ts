@@ -53,7 +53,7 @@ async function walk(node: SceneNode, state: ExtractState): Promise<AnyNode | nul
     }
     out = frame;
   } else if (node.type === "TEXT") {
-    out = extractText(node as TextNode);
+    out = await extractText(node as TextNode);
   } else if (node.type === "INSTANCE") {
     const inst = await extractInstance(node as InstanceNode);
     const children = (node as unknown as { children?: readonly SceneNode[] }).children;
