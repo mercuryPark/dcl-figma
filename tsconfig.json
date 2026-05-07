@@ -21,5 +21,5 @@
     "noEmit": true
   },
   "include": ["src/**/*", "locales/**/*.json"],
-  "exclude": ["node_modules", "dist", "docs/legacy"]
+  "exclude": ["node_modules", "dist", "docs/legacy", "src/**/*.test.ts"]
 }
