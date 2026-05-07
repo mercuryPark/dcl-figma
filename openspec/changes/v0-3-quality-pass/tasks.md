@@ -8,10 +8,10 @@
 
 ## 2. Cluster B — Image fill detail + Variables scope/codeSyntax
 
-- [ ] 2.1 Extend `src/schema.ts` Paint IMAGE variant with `rotation?`, `scalingFactor?`, `cropRect?`. Extend `VariableEntry` with `scope?: string[]`, `codeSyntax?: { WEB?, ANDROID?, iOS? }`.
-- [ ] 2.2 Update `src/extract/common.ts#normalizePaints` to preserve image rotation/scaling/crop.
-- [ ] 2.3 Update `src/tokens/variables.ts` to capture `scope` and `codeSyntax` per Variable entry.
-- [ ] 2.4 Add fixture coverage and verify.
+- [x] 2.1 Extend `src/schema.ts` Paint IMAGE variant with `rotation?`, `scalingFactor?`, `cropRect?`. Extend `VariableEntry` with `scope?: string[]`, `codeSyntax?: { WEB?, ANDROID?, iOS? }`.
+- [x] 2.2 Update `src/extract/common.ts#normalizePaints` to preserve image rotation/scaling/crop.
+- [x] 2.3 Update `src/tokens/variables.ts` to capture `scope` and `codeSyntax` per Variable entry.
+- [x] 2.4 Add fixture coverage and verify.
 
 ## 3. Cluster C — Mixed text runs (textRange)
 

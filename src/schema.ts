@@ -35,7 +35,7 @@ export interface IndividualStrokes { top: number; right: number; bottom: number;
 export type Paint =
   | { type: "SOLID"; color: string; opacity?: number }
   | { type: "GRADIENT_LINEAR" | "GRADIENT_RADIAL" | "GRADIENT_ANGULAR" | "GRADIENT_DIAMOND"; stops: Array<{ position: number; color: string }>; opacity?: number; gradientTransform?: number[][] }
-  | { type: "IMAGE"; imageHash: string; scaleMode?: string; opacity?: number };
+  | { type: "IMAGE"; imageHash: string; scaleMode?: string; opacity?: number; rotation?: number; scalingFactor?: number; cropRect?: { x: number; y: number; w: number; h: number } };
 
 export interface Effect {
   type: string; // DROP_SHADOW / INNER_SHADOW / LAYER_BLUR / BACKGROUND_BLUR
@@ -173,6 +173,8 @@ export interface VariableEntry {
   value: unknown;
   modeId: string;
   modeName: string;
+  scope?: string[];
+  codeSyntax?: { WEB?: string; ANDROID?: string; iOS?: string };
 }
 
 export interface Tokens {

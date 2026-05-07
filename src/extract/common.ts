@@ -14,6 +14,9 @@ type PaintFigma = {
   gradientTransform?: ReadonlyArray<ReadonlyArray<number>>;
   imageHash?: string | null;
   scaleMode?: string;
+  imageTransform?: ReadonlyArray<ReadonlyArray<number>>;
+  rotation?: number;
+  scalingFactor?: number;
 };
 
 type EffectFigma = {
@@ -32,6 +35,11 @@ function rgbaToHex(r: number, g: number, b: number, a?: number): string {
   return `${base}${h(a)}`;
 }
 
+function round2Clean(n: number): number {
+  const rounded = round2(n);
+  return Object.is(rounded, -0) ? 0 : rounded;
+}
+
 function normalizeTransform2x3(raw: unknown): number[][] | undefined {
   if (!Array.isArray(raw) || raw.length !== 2) return undefined;
   const transform: number[][] = [];
@@ -39,13 +47,43 @@ function normalizeTransform2x3(raw: unknown): number[][] | undefined {
     if (!Array.isArray(row) || row.length !== 3 || !row.every((v) => typeof v === "number" && Number.isFinite(v))) {
       return undefined;
     }
-    transform.push(row.map((v) => {
-      const rounded = round2(v);
-      return Object.is(rounded, -0) ? 0 : rounded;
-    }));
+    transform.push(row.map(round2Clean));
   }
   const isIdentity = transform.every((row, rowIndex) => row.every((value, colIndex) => value === IDENTITY_TRANSFORM[rowIndex]?.[colIndex]));
   return isIdentity ? undefined : transform;
+}
+
+function readTransform2x3(raw: unknown): [[number, number, number], [number, number, number]] | undefined {
+  if (!Array.isArray(raw) || raw.length !== 2) return undefined;
+  const first = raw[0];
+  const second = raw[1];
+  if (!Array.isArray(first) || !Array.isArray(second) || first.length !== 3 || second.length !== 3) return undefined;
+  if (!first.every((v) => typeof v === "number" && Number.isFinite(v))) return undefined;
+  if (!second.every((v) => typeof v === "number" && Number.isFinite(v))) return undefined;
+  return [
+    [first[0], first[1], first[2]],
+    [second[0], second[1], second[2]]
+  ];
+}
+
+function imageRotationFromTransform(raw: unknown): number | undefined {
+  const transform = readTransform2x3(raw);
+  if (!transform) return undefined;
+  const [[a, b], [c, d]] = transform;
+  if (b === 0 && c === 0) return undefined;
+  const radians = c !== 0 || a !== 0 ? Math.atan2(c, a) : Math.atan2(-b, d);
+  const degrees = round2Clean(radians * 180 / Math.PI);
+  return degrees === 0 ? undefined : degrees;
+}
+
+function imageCropRectFromTransform(raw: unknown): { x: number; y: number; w: number; h: number } | undefined {
+  const transform = readTransform2x3(raw);
+  if (!transform) return undefined;
+  const [[a, b, e], [c, d, f]] = transform;
+  if (b !== 0 || c !== 0) return undefined;
+  const cropRect = { x: round2Clean(e), y: round2Clean(f), w: round2Clean(a), h: round2Clean(d) };
+  if (cropRect.x === 0 && cropRect.y === 0 && cropRect.w === 1 && cropRect.h === 1) return undefined;
+  return cropRect;
 }
 
 function isStrokeAlign(value: unknown): value is StrokeAlign {
@@ -151,6 +189,17 @@ export function normalizePaints(raw: unknown): Paint[] | undefined {
         imageHash: fig.imageHash ?? ""
       };
       if (fig.scaleMode) entry.scaleMode = fig.scaleMode;
+      const explicitRotation = typeof fig.rotation === "number" && Number.isFinite(fig.rotation)
+        ? round2Clean(fig.rotation)
+        : undefined;
+      const rotation = explicitRotation !== undefined ? explicitRotation : imageRotationFromTransform(fig.imageTransform);
+      if (rotation !== undefined && rotation !== 0) entry.rotation = rotation;
+      if (typeof fig.scalingFactor === "number" && Number.isFinite(fig.scalingFactor)) {
+        const scalingFactor = round2Clean(fig.scalingFactor);
+        if (scalingFactor !== 1) entry.scalingFactor = scalingFactor;
+      }
+      const cropRect = imageCropRectFromTransform(fig.imageTransform);
+      if (cropRect) entry.cropRect = cropRect;
       out.push(entry);
     }
   }

@@ -11,6 +11,8 @@ export interface VariableCollectionResult {
   error: boolean;
 }
 
+type VariableCodeSyntax = NonNullable<VariableEntry["codeSyntax"]>;
+
 function rgbaToHex(r: number, g: number, b: number, a?: number): string {
   const h = (n: number) => Math.round(Math.max(0, Math.min(1, n)) * 255).toString(16).padStart(2, "0");
   const base = `#${h(r)}${h(g)}${h(b)}`;
@@ -34,6 +36,22 @@ function serializeValue(value: unknown): unknown {
   return String(value);
 }
 
+function extractScopes(raw: unknown): string[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  const scopes = raw.filter((scope): scope is string => typeof scope === "string");
+  return scopes.length ? scopes : undefined;
+}
+
+function extractCodeSyntax(raw: unknown): VariableCodeSyntax | undefined {
+  if (raw === null || typeof raw !== "object") return undefined;
+  const source = raw as Record<string, unknown>;
+  const out: VariableCodeSyntax = {};
+  if (typeof source.WEB === "string") out.WEB = source.WEB;
+  if (typeof source.ANDROID === "string") out.ANDROID = source.ANDROID;
+  if (typeof source.iOS === "string") out.iOS = source.iOS;
+  return Object.keys(out).length ? out : undefined;
+}
+
 export async function collectVariables(): Promise<VariableCollectionResult> {
   try {
     const anyFigma = figma as unknown as {
@@ -41,6 +59,8 @@ export async function collectVariables(): Promise<VariableCollectionResult> {
         getLocalVariablesAsync: () => Promise<ReadonlyArray<{
           id: string; name: string; resolvedType: string; variableCollectionId: string;
           valuesByMode: Record<string, unknown>;
+          scopes?: unknown;
+          codeSyntax?: unknown;
         }>>;
         getVariableCollectionByIdAsync: (id: string) => Promise<{
           id: string; name: string; modes: ReadonlyArray<{ modeId: string; name: string }>;
@@ -69,8 +89,10 @@ export async function collectVariables(): Promise<VariableCollectionResult> {
           collection = { name: "", modes: new Map() };
         }
       }
+      const scope = extractScopes(v.scopes);
+      const codeSyntax = extractCodeSyntax(v.codeSyntax);
       for (const [modeId, raw] of Object.entries(v.valuesByMode)) {
-        entries.push({
+        const entry: VariableEntry = {
           id: v.id,
           name: v.name,
           collectionName: collection.name,
@@ -78,7 +100,10 @@ export async function collectVariables(): Promise<VariableCollectionResult> {
           value: serializeValue(raw),
           modeId,
           modeName: collection.modes.get(modeId) ?? modeId
-        });
+        };
+        if (scope) entry.scope = scope;
+        if (codeSyntax) entry.codeSyntax = codeSyntax;
+        entries.push(entry);
       }
     }
 

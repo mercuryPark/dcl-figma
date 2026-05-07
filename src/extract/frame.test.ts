@@ -111,3 +111,60 @@ test("gradientTransform identity matrix is omitted", () => {
   }]);
   assert.equal("gradientTransform" in (paints?.[0] ?? {}), false);
 });
+
+test("image paint preserves explicit rotation and scalingFactor with round2", () => {
+  const paints = normalizePaints([{
+    type: "IMAGE",
+    imageHash: "hash-1",
+    scaleMode: "TILE",
+    rotation: 12.345,
+    scalingFactor: 1.234
+  }]);
+  assert.deepEqual(paints?.[0], {
+    type: "IMAGE",
+    imageHash: "hash-1",
+    scaleMode: "TILE",
+    rotation: 12.35,
+    scalingFactor: 1.23
+  });
+});
+
+test("image paint omits default rotation, scalingFactor, and identity cropRect", () => {
+  const paints = normalizePaints([{
+    type: "IMAGE",
+    imageHash: "hash-2",
+    rotation: 0,
+    scalingFactor: 1,
+    imageTransform: [[1, 0, 0], [0, 1, 0]]
+  }]);
+  assert.deepEqual(paints?.[0], {
+    type: "IMAGE",
+    imageHash: "hash-2"
+  });
+});
+
+test("image paint extracts cropRect from non-rotated imageTransform", () => {
+  const paints = normalizePaints([{
+    type: "IMAGE",
+    imageHash: "hash-3",
+    imageTransform: [[0.333, 0, 0.125], [0, 0.666, 0.25]]
+  }]);
+  assert.deepEqual(paints?.[0], {
+    type: "IMAGE",
+    imageHash: "hash-3",
+    cropRect: { x: 0.13, y: 0.25, w: 0.33, h: 0.67 }
+  });
+});
+
+test("image paint derives rotation from rotated imageTransform and skips cropRect", () => {
+  const paints = normalizePaints([{
+    type: "IMAGE",
+    imageHash: "hash-4",
+    imageTransform: [[0, -1, 0.1], [1, 0, 0.2]]
+  }]);
+  assert.deepEqual(paints?.[0], {
+    type: "IMAGE",
+    imageHash: "hash-4",
+    rotation: 90
+  });
+});
