@@ -89,17 +89,47 @@ export function nodeBox(n: { x?: number; y?: number; width?: number; height?: nu
   return { x: round2(n.x), y: round2(n.y), w: round2(n.width), h: round2(n.height) };
 }
 
-export function commonFields(n: SceneNode): {
-  visible?: boolean; opacity?: number; rotation?: number; blendMode?: string; locked?: boolean;
-} {
-  const out: { visible?: boolean; opacity?: number; rotation?: number; blendMode?: string; locked?: boolean } = {};
+interface CommonOut {
+  visible?: boolean;
+  opacity?: number;
+  rotation?: number;
+  blendMode?: string;
+  locked?: boolean;
+  constraints?: { horizontal: string; vertical: string };
+  layoutPositioning?: string;
+}
+
+export function commonFields(n: SceneNode): CommonOut {
+  const out: CommonOut = {};
   if (n.visible === false) out.visible = false;
-  const any = n as unknown as { opacity?: number; rotation?: number; blendMode?: string };
+  const any = n as unknown as {
+    opacity?: number;
+    rotation?: number;
+    blendMode?: string;
+    constraints?: { horizontal?: unknown; vertical?: unknown };
+    layoutPositioning?: string;
+  };
   if (typeof any.opacity === "number" && any.opacity !== 1) out.opacity = round2(any.opacity);
   if (typeof any.rotation === "number" && any.rotation !== 0) out.rotation = round2(any.rotation);
   if (typeof any.blendMode === "string" && any.blendMode !== "NORMAL" && any.blendMode !== "PASS_THROUGH") {
     out.blendMode = any.blendMode;
   }
   if (n.locked === true) out.locked = true;
+  // Constraints default to MIN/MIN; emit only when non-default to keep the dump compact.
+  if (
+    any.constraints &&
+    typeof any.constraints.horizontal === "string" &&
+    typeof any.constraints.vertical === "string" &&
+    !(any.constraints.horizontal === "MIN" && any.constraints.vertical === "MIN")
+  ) {
+    out.constraints = {
+      horizontal: any.constraints.horizontal,
+      vertical: any.constraints.vertical
+    };
+  }
+  // layoutPositioning is "AUTO" by default; we only care about ABSOLUTE (escape from parent's auto-layout).
+  if (typeof any.layoutPositioning === "string" && any.layoutPositioning !== "AUTO") {
+    out.layoutPositioning = any.layoutPositioning;
+  }
   return out;
 }

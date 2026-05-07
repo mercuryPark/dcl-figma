@@ -41,7 +41,9 @@ export function extractText(n: TextNode): TextOut {
 
   const ls = any.letterSpacing as { unit?: string; value?: number } | undefined;
   if (ls && typeof ls === "object" && typeof ls.value === "number") {
-    out.style.letterSpacing = round2(ls.value);
+    if (ls.unit === "PERCENT") out.style.letterSpacing = `${round2(ls.value)}%`;
+    else if (ls.unit === "PIXELS") out.style.letterSpacing = `${round2(ls.value)}px`;
+    else out.style.letterSpacing = round2(ls.value);
   }
 
   if (typeof any.textCase === "string" && any.textCase !== "ORIGINAL") out.style.textCase = any.textCase;

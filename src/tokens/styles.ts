@@ -43,7 +43,9 @@ export async function collectStyles(): Promise<StyleCollectionResult> {
       }
     }
     if (any.letterSpacing && typeof any.letterSpacing.value === "number") {
-      tok.letterSpacing = round2(any.letterSpacing.value);
+      if (any.letterSpacing.unit === "PERCENT") tok.letterSpacing = `${round2(any.letterSpacing.value)}%`;
+      else if (any.letterSpacing.unit === "PIXELS") tok.letterSpacing = `${round2(any.letterSpacing.value)}px`;
+      else tok.letterSpacing = round2(any.letterSpacing.value);
     }
     typography.push(tok);
   }

@@ -6,7 +6,18 @@ All notable changes to **Design Context for LLMs** are documented here. This pro
 
 ## [Unreleased]
 
-_Nothing yet._
+### Added
+- **Layout fidelity**: `counterAxisSpacing`, `layoutWrap` extracted on FrameLikeNode; per-node `constraints` and `layoutPositioning` (only when non-default).
+- **Per-corner radii**: `cornerRadii: { tl, tr, br, bl }` on FrameLikeNode and VectorNode when corners differ (or `cornerRadius` is `figma.mixed`).
+- **Slim section tree layout cues**: each frame line now carries inline hints — `[hstack/vstack, wrap, justify=…, align=…, gap=…, gapY=…, p=…]` — so layout intent survives Slim mode.
+
+### Changed
+- **BREAKING — `TextNode.style.letterSpacing` and `TypographyToken.letterSpacing`** changed from `number` to `string | number`. Unit-aware values are now emitted as `"2%"` or `"0.5px"`; raw `number` is reserved for unit-unknown fallback. Consumers that did arithmetic on this field must now parse the unit suffix.
+- **BREAKING — `InstanceNode.overrides`** changed from `Record<string, string[]>` to `Record<string, { fields: string[]; nodeType?: string }>`. The current values for overridden fields remain recoverable via the matching child id within `children`; this change only restructures the metadata.
+
+### Fixed
+- **Progress bar stuck at 0%**: phase-based percentage mapping with an asymptotic curve during the traversing phase — the bar always advances, never overshoots. Phase label additionally shows the running processed-node count during traversal.
+- **Double-click on Dump button**: primary button is now disabled during a dump and re-enabled on completion, cancellation, or error. Cancelled dumps explicitly emit `phase: idle` so the UI never gets stuck in a locked state.
 
 ## [0.1.0] - 2026-04-23
 

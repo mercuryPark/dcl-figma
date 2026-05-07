@@ -34,10 +34,17 @@ export async function extractInstance(n: InstanceNode): Promise<InstanceOut> {
     }
   }
 
+  // Each override entry says which fields differ from the main component for a child node id.
+  // We do NOT call figma.getNodeByIdAsync per override — that previously caused N async lookups
+  // per instance, accumulating heavy latency on instance-rich pages. The override target's
+  // current field values, name, and type are all already present in this instance's `children`
+  // subtree (the walker extracted them). Consumers resolve `overrides[id]` by locating the
+  // matching id within `children`. The optional `nodeType` field on InstanceOverride is
+  // reserved for a future post-walk enrichment pass.
   if (any.overrides && any.overrides.length) {
-    const o: Record<string, string[]> = {};
+    const o: Record<string, { fields: string[]; nodeType?: string }> = {};
     for (const entry of any.overrides) {
-      o[entry.id] = [...entry.overriddenFields];
+      o[entry.id] = { fields: [...entry.overriddenFields] };
     }
     out.overrides = o;
   }

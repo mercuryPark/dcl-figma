@@ -32,12 +32,63 @@ function collectTextCharacters(node: AnyNode, out: string[], limit: number): voi
   }
 }
 
+// Inline layout cues so the section tree alone tells the LLM how children are arranged
+// (Slim drops the per-frame layout fields, this is the only place that signal survives).
+function justifyOf(v: string | undefined): string | null {
+  if (!v || v === "MIN") return null;
+  if (v === "CENTER") return "center";
+  if (v === "MAX") return "end";
+  if (v === "SPACE_BETWEEN") return "space-between";
+  return null;
+}
+
+function alignOf(v: string | undefined): string | null {
+  if (!v || v === "MIN") return null;
+  if (v === "CENTER") return "center";
+  if (v === "MAX") return "end";
+  if (v === "BASELINE") return "baseline";
+  return null;
+}
+
+function layoutHint(n: AnyNode): string {
+  if (n.type !== "FRAME" && n.type !== "GROUP" && n.type !== "SECTION" &&
+      n.type !== "COMPONENT" && n.type !== "COMPONENT_SET") return "";
+  const f = n as {
+    layoutMode?: string; layoutWrap?: string;
+    primaryAxisAlignItems?: string; counterAxisAlignItems?: string;
+    itemSpacing?: number; counterAxisSpacing?: number;
+    paddingTop?: number; paddingRight?: number; paddingBottom?: number; paddingLeft?: number;
+  };
+  const parts: string[] = [];
+  if (f.layoutMode === "HORIZONTAL") parts.push("hstack");
+  else if (f.layoutMode === "VERTICAL") parts.push("vstack");
+  if (f.layoutWrap === "WRAP") parts.push("wrap");
+  const justify = justifyOf(f.primaryAxisAlignItems);
+  if (justify) parts.push(`justify=${justify}`);
+  const align = alignOf(f.counterAxisAlignItems);
+  if (align) parts.push(`align=${align}`);
+  if (typeof f.itemSpacing === "number") parts.push(`gap=${f.itemSpacing}`);
+  if (typeof f.counterAxisSpacing === "number") parts.push(`gapY=${f.counterAxisSpacing}`);
+  const hasPad = [f.paddingTop, f.paddingRight, f.paddingBottom, f.paddingLeft].some((v) => typeof v === "number");
+  if (hasPad) {
+    const t = f.paddingTop ?? 0, r = f.paddingRight ?? 0, b = f.paddingBottom ?? 0, l = f.paddingLeft ?? 0;
+    if (t === r && r === b && b === l) {
+      if (t !== 0) parts.push(`p=${t}`);
+    } else if (t === b && l === r) {
+      parts.push(`p=${t} ${l}`);
+    } else {
+      parts.push(`p=${t} ${r} ${b} ${l}`);
+    }
+  }
+  return parts.length ? ` [${parts.join(", ")}]` : "";
+}
+
 function renderSectionTree(nodes: readonly AnyNode[], depth: number, maxDepth: number): string[] {
   if (depth >= maxDepth) return [];
   const lines: string[] = [];
   for (const n of nodes) {
     const name = n.name ? n.name : `(${n.type})`;
-    lines.push(`${"  ".repeat(depth)}${n.type}: ${name}`);
+    lines.push(`${"  ".repeat(depth)}${n.type}: ${name}${layoutHint(n)}`);
     const children = (n as { children?: AnyNode[] }).children;
     if (children && children.length) {
       lines.push(...renderSectionTree(children, depth + 1, maxDepth));

@@ -29,6 +29,10 @@ export function extractVector(n: SceneNode & { type: VectorFamilyType }): Vector
     strokes?: unknown;
     strokeWeight?: number | typeof figma.mixed;
     cornerRadius?: number | typeof figma.mixed;
+    topLeftRadius?: number;
+    topRightRadius?: number;
+    bottomRightRadius?: number;
+    bottomLeftRadius?: number;
   };
 
   const fills = normalizePaints(any.fills);
@@ -36,7 +40,17 @@ export function extractVector(n: SceneNode & { type: VectorFamilyType }): Vector
   const strokes = normalizePaints(any.strokes);
   if (strokes) out.strokes = strokes;
   if (typeof any.strokeWeight === "number" && any.strokeWeight !== 0) out.strokeWeight = round2(any.strokeWeight);
-  if (typeof any.cornerRadius === "number" && any.cornerRadius !== 0) out.cornerRadius = round2(any.cornerRadius);
+  if (typeof any.cornerRadius === "number" && any.cornerRadius !== 0) {
+    out.cornerRadius = round2(any.cornerRadius);
+  } else if (typeof any.cornerRadius === "symbol" || typeof any.topLeftRadius === "number") {
+    const tl = round2(any.topLeftRadius ?? 0);
+    const tr = round2(any.topRightRadius ?? 0);
+    const br = round2(any.bottomRightRadius ?? 0);
+    const bl = round2(any.bottomLeftRadius ?? 0);
+    if (tl !== 0 || tr !== 0 || br !== 0 || bl !== 0) {
+      out.cornerRadii = { tl, tr, br, bl };
+    }
+  }
 
   return out;
 }

@@ -53,16 +53,26 @@ interface NodeCommon {
   rotation?: number;
   blendMode?: string;
   locked?: boolean;
+  // Parent-relative resize behavior. Only emitted when non-default (non MIN/MIN).
+  constraints?: { horizontal: string; vertical: string };
+  // Auto-layout positioning. Only emitted when "ABSOLUTE" (i.e., child opts out of auto-layout).
+  layoutPositioning?: string;
 }
+
+// Per-corner radii. Only emitted when corners differ from each other.
+export interface CornerRadii { tl: number; tr: number; br: number; bl: number; }
 
 export interface FrameLikeNode extends NodeCommon {
   type: "FRAME" | "GROUP" | "SECTION" | "COMPONENT" | "COMPONENT_SET";
   layoutMode?: string;
+  layoutWrap?: string;
   primaryAxisAlignItems?: string;
   counterAxisAlignItems?: string;
   primaryAxisSizingMode?: string;
   counterAxisSizingMode?: string;
   itemSpacing?: number;
+  // Cross-axis spacing used when layoutWrap === "WRAP". Distinct from itemSpacing.
+  counterAxisSpacing?: number;
   paddingLeft?: number;
   paddingRight?: number;
   paddingTop?: number;
@@ -71,6 +81,7 @@ export interface FrameLikeNode extends NodeCommon {
   strokes?: Paint[];
   effects?: Effect[];
   cornerRadius?: number;
+  cornerRadii?: CornerRadii;
   clipsContent?: boolean;
   children?: AnyNode[];
 }
@@ -82,8 +93,10 @@ export interface TextNode extends NodeCommon {
     fontFamily?: string;
     fontStyle?: string;
     fontSize?: number;
+    // Stringified with unit suffix when known: e.g., "120%", "1.2px", or "AUTO".
     lineHeight?: string | number;
-    letterSpacing?: number;
+    // Stringified with unit suffix when known ("4%" or "0.5px"); raw number is fallback only.
+    letterSpacing?: string | number;
     textCase?: string;
     textDecoration?: string;
   };
@@ -97,15 +110,25 @@ export interface VectorNode extends NodeCommon {
   strokes?: Paint[];
   strokeWeight?: number;
   cornerRadius?: number;
+  cornerRadii?: CornerRadii;
   svg?: string;
   svgExportFailed?: boolean;
+}
+
+// One override entry = which fields differ from the main component for a given child node id.
+// The child node with this id appears in the instance's `children` tree, so the *current* values
+// of those fields are recoverable by looking up that node. Top-level instance overrides (fills,
+// box, etc.) live on the InstanceNode itself.
+export interface InstanceOverride {
+  fields: string[];
+  nodeType?: string;
 }
 
 export interface InstanceNode extends NodeCommon {
   type: "INSTANCE";
   mainComponentId: string | null;
   mainComponentName?: string;
-  overrides?: Record<string, unknown>;
+  overrides?: Record<string, InstanceOverride>;
   fills?: Paint[];
   children?: AnyNode[];
 }
@@ -122,7 +145,7 @@ export interface TypographyToken {
   fontStyle?: string;
   fontSize?: number;
   lineHeight?: string | number;
-  letterSpacing?: number;
+  letterSpacing?: string | number;
 }
 export interface EffectToken { id: string; name: string; effects: Effect[] }
 
