@@ -137,6 +137,10 @@ let cancelled = false;
 async function handleDump(req: DumpRequest): Promise<void> {
   cancelled = false;
 
+  // Cancel-aware exit: always emit phase: idle so the UI can unlock its primary button
+  // (the UI treats "done" and "idle" as terminal states).
+  const exitCancelled = (): void => emitPhase("idle");
+
   try {
     emitPhase("loadingPages");
     const { roots, pages: pageBuckets, pageIdFocus, pageNameFocus } = await resolveRoots(req.scope);
@@ -152,7 +156,7 @@ async function handleDump(req: DumpRequest): Promise<void> {
     let totalProcessed = 0;
 
     for (const bucket of pageBuckets) {
-      if (cancelled) return;
+      if (cancelled) { exitCancelled(); return; }
       const { nodes, vectors, processed } = await extractRoots(bucket.roots, {
         includeHidden: req.includeHidden,
         onProgress: (n) => post({ type: "progress", processed: totalProcessed + n }),
@@ -163,7 +167,7 @@ async function handleDump(req: DumpRequest): Promise<void> {
       totalProcessed += processed;
     }
 
-    if (cancelled) return;
+    if (cancelled) { exitCancelled(); return; }
 
     let tokens: Tokens = { colors: [], typography: [], effects: [], variables: [] };
     let variablesError = false;

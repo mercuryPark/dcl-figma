@@ -122,7 +122,12 @@ function updateResultsLabels(): void {
 }
 
 function updatePhaseLabel(): void {
-  els.phaseLabel.textContent = t(`phase.${state.phase}`);
+  const base = t(`phase.${state.phase}`);
+  if (state.phase === "traversing" && state.processed > 0) {
+    els.phaseLabel.textContent = `${base} (${state.processed})`;
+  } else {
+    els.phaseLabel.textContent = base;
+  }
 }
 
 // --- messaging -------------------------------------------------------------
@@ -154,6 +159,11 @@ window.onmessage = (event: MessageEvent) => {
 
   if (m.type === "phase") {
     state.phase = (m.phase as string) ?? "idle";
+    if (state.phase === "idle" || state.phase === "loadingPages") state.processed = 0;
+    // idle is a terminal state used by both successful completion (post-done) and cancellation;
+    // either way the primary button should re-enable so the user is never locked out.
+    if (state.phase === "done" || state.phase === "idle") els.btnDump.disabled = false;
+    renderProgress();
     updatePhaseLabel();
     return;
   }
@@ -161,6 +171,7 @@ window.onmessage = (event: MessageEvent) => {
   if (m.type === "progress") {
     state.processed = (m.processed as number) ?? 0;
     renderProgress();
+    updatePhaseLabel();
     return;
   }
 
@@ -198,8 +209,29 @@ window.onmessage = (event: MessageEvent) => {
 
 // --- UI wiring -------------------------------------------------------------
 
+// Phase-based progress mapping. The sandbox does not pre-compute total node count, so we
+// approximate progress with phase boundaries and let the traversing phase grow with the
+// processed counter via an asymptotic curve (so the bar always moves but never overshoots).
+const PHASE_PERCENT = {
+  idle: 0,
+  loadingPages: 5,
+  traversing: 25,
+  collectingStyles: 65,
+  collectingVariables: 72,
+  exportingSvg: 80,
+  buildingSlim: 90,
+  sending: 95,
+  done: 100
+} as const;
+const TRAVERSE_MIN = 25;
+const TRAVERSE_MAX = 60;
+
 function renderProgress(): void {
-  const pct = state.total > 0 ? Math.min(100, Math.round((state.processed / state.total) * 100)) : 0;
+  let pct: number = PHASE_PERCENT[state.phase as keyof typeof PHASE_PERCENT] ?? 0;
+  if (state.phase === "traversing" && state.processed > 0) {
+    const k = state.processed / (state.processed + 500);
+    pct = Math.round(TRAVERSE_MIN + (TRAVERSE_MAX - TRAVERSE_MIN) * k);
+  }
   els.progressFill.style.width = `${pct}%`;
   els.progressBar.setAttribute("aria-valuenow", String(pct));
 }
@@ -229,6 +261,7 @@ function enableResults(): void {
   els.btnDownloadSlim.disabled = false;
   els.btnDownloadFull.disabled = false;
   els.btnCopySlim.disabled = false;
+  els.btnDump.disabled = false;
 }
 
 function renderWarnings(): void {
@@ -305,7 +338,13 @@ els.optHidden.addEventListener("change", () => { state.includeHidden = els.optHi
 els.optTokens.addEventListener("change", () => { state.includeTokens = els.optTokens.checked; persistOptions(); });
 
 els.btnDump.addEventListener("click", () => {
+  if (els.btnDump.disabled) return;
+  els.btnDump.disabled = true;
   clearResults();
+  state.processed = 0;
+  state.phase = "loadingPages";
+  renderProgress();
+  updatePhaseLabel();
   state.dumpRequestId = String(Date.now());
   receive.buffers.slim.length = 0;
   receive.buffers.full.length = 0;
