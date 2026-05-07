@@ -44,9 +44,10 @@ git tag vX.Y.Z
 git push origin main vX.Y.Z
 
 # 4. Build the release zip
-#    The zip must contain `manifest.json` at the root and a `dist/` folder
-#    (matches README's "the folder will contain manifest.json and a dist/ directory").
-zip -r dcl-figma-vX.Y.Z.zip manifest.json dist/
+#    The zip must contain `manifest.json` at the root plus only the plugin
+#    runtime files inside `dist/` (NOT `dist/test/` — those are test
+#    bundles produced by `npm test`, irrelevant to end users).
+zip -r dcl-figma-vX.Y.Z.zip manifest.json dist/code.js dist/ui.html
 
 # 5. Publish the GitHub Release with the zip attached
 gh release create vX.Y.Z dcl-figma-vX.Y.Z.zip \
